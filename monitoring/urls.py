@@ -1,37 +1,13 @@
 from django.urls import path
 
-from .views import (
-    dashboard,
-    mood,
-    sleep,
-    journal
-)
+from . import views
 
 
 urlpatterns = [
-
-    path(
-        '',
-        dashboard,
-        name='dashboard'
-    ),
-
-    path(
-        'mood/',
-        mood,
-        name='mood'
-    ),
-
-    path(
-        'sleep/',
-        sleep,
-        name='sleep'
-    ),
-
-    path(
-        'journal/',
-        journal,
-        name='journal'
-    ),
-
+    path('', views.dashboard, name='dashboard'),
+    path('mood/', views.mood, name='mood'),
+    path('sleep/', views.sleep, name='sleep'),
+    path('journal/', views.journal, name='journal'),
+    path('stress/', views.stress, name='stress'),
+    path('breathing/', views.breathing, name='breathing'),
 ]

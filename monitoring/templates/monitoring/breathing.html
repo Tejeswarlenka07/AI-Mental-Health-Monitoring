@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Breathing Exercise - MindCare AI</title>
+
+</head>
+
+<body>
+
+    <h1>Breathing Exercise</h1>
+
+    <p>
+        Take a few minutes to relax and focus on your breathing.
+    </p>
+
+    <h2 id="phase">Ready</h2>
+
+    <h1 id="timer">0</h1>
+
+    <button onclick="startBreathing()">
+        Start Exercise
+    </button>
+
+    <br><br>
+
+    <form method="POST" id="completeForm" style="display: none;">
+
+    {% csrf_token %}
+
+    <button type="submit">
+        Save Completed Session
+    </button>
+
+</form>
+
+    <hr>
+
+    <h2>Previous Breathing Sessions</h2>
+
+    {% for breathing in breathings %}
+
+        <p>
+            Completed {{ breathing.duration }} minute session
+        </p>
+
+        <small>
+            {{ breathing.created_at }}
+        </small>
+
+        <hr>
+
+    {% empty %}
+
+        <p>No breathing sessions yet.</p>
+
+    {% endfor %}
+
+    <br>
+
+    <a href="{% url 'dashboard' %}">
+        Back to Dashboard
+    </a>
+
+
+    <script>
+
+        let phase = "ready";
+        let time = 0;
+        let running = false;
+        let cycles = 0;
+        let totalTime = 300;
+
+
+        function startBreathing() {
+
+            if (running) {
+                return;
+            }
+
+            running = true;
+            cycles = 0;
+            totalTime = 300;
+
+            inhale();
+
+        }
+
+
+        function inhale() {
+
+            phase = "Inhale";
+            time = 4;
+
+            document.getElementById("phase").innerText = phase;
+
+            countdown();
+
+        }
+
+
+        function hold() {
+
+            phase = "Hold";
+            time = 4;
+
+            document.getElementById("phase").innerText = phase;
+
+            countdown();
+
+        }
+
+
+        function exhale() {
+
+            phase = "Exhale";
+            time = 6;
+
+            document.getElementById("phase").innerText = phase;
+
+            countdown();
+
+        }
+
+
+        function countdown() {
+
+            document.getElementById("timer").innerText = time;
+
+            let interval = setInterval(function() {
+
+                time--;
+                totalTime--;
+
+                document.getElementById("timer").innerText = time;
+
+
+                if (totalTime <= 0) {
+
+                    clearInterval(interval);
+
+                    running = false;
+
+                   document.getElementById("phase").innerText =
+    "Exercise Complete!";
+
+document.getElementById("timer").innerText = "✓";
+
+document.getElementById("completeForm").style.display = "block";
+
+return;
+
+                }
+
+
+                if (time <= 0) {
+
+                    clearInterval(interval);
+
+
+                    if (phase == "Inhale") {
+
+                        hold();
+
+                    }
+
+                    else if (phase == "Hold") {
+
+                        exhale();
+
+                    }
+
+                    else if (phase == "Exhale") {
+
+                        cycles++;
+
+                        inhale();
+
+                    }
+
+                }
+
+            }, 1000);
+
+        }
+
+    </script>
+
+</body>
+
+</html>

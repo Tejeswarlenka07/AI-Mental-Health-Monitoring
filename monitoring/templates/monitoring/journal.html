@@ -1,0 +1,84 @@
+<h1>My Journal</h1>
+
+<p>Write about your thoughts and feelings.</p>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    <label>Title</label>
+
+    <br>
+
+    <input
+        type="text"
+        name="title"
+        placeholder="Enter journal title"
+        required
+    >
+
+    <br><br>
+
+    <label>What's on your mind?</label>
+
+    <br>
+
+    <textarea
+        name="content"
+        rows="8"
+        cols="50"
+        placeholder="Write your thoughts here..."
+        required
+    ></textarea>
+
+    <br><br>
+
+    <button type="submit">
+        Save Journal
+    </button>
+
+</form>
+
+<hr>
+
+<h2>Previous Journal Entries</h2>
+
+{% for entry in journals %}
+
+    <div>
+
+        <h3>{{ entry.title }}</h3>
+
+        <p>
+            {{ entry.content }}
+        </p>
+
+        <p>
+            <strong>AI Sentiment:</strong>
+            {{ entry.sentiment }}
+        </p>
+
+        <p>
+            <strong>Sentiment Score:</strong>
+            {{ entry.sentiment_score }}
+        </p>
+
+        <small>
+            {{ entry.created_at }}
+        </small>
+
+    </div>
+
+    <hr>
+
+{% empty %}
+
+    <p>No journal entries yet.</p>
+
+{% endfor %}
+
+<br>
+
+<a href="{% url 'dashboard' %}">
+    Back to Dashboard
+</a>

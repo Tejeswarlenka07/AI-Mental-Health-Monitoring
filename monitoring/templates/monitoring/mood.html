@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Mood Tracking - MindCare AI</title>
+</head>
+
+<body>
+
+    <h1>How are you feeling today?</h1>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <label>Select your mood:</label>
+
+        <select name="mood" required>
+
+            <option value="">-- Select Mood --</option>
+
+            <option value="excellent">
+                😊 Excellent
+            </option>
+
+            <option value="good">
+                🙂 Good
+            </option>
+
+            <option value="okay">
+                😐 Okay
+            </option>
+
+            <option value="sad">
+                😔 Sad
+            </option>
+
+            <option value="very_sad">
+                😢 Very Sad
+            </option>
+
+        </select>
+
+        <br><br>
+
+        <label>How was your day?</label>
+
+        <br>
+
+        <textarea
+            name="note"
+            rows="5"
+            cols="40"
+            placeholder="Write something about your day..."
+        ></textarea>
+
+        <br><br>
+
+        <button type="submit">
+            Save Mood
+        </button>
+
+    </form>
+
+
+    <hr>
+
+    <h2>Your Previous Mood Entries</h2>
+
+    {% for entry in moods %}
+
+        <div>
+
+            <p>
+                <strong>{{ entry.get_mood_display }}</strong>
+            </p>
+
+            <p>
+                {{ entry.note }}
+            </p>
+
+            <small>
+                {{ entry.created_at }}
+            </small>
+
+        </div>
+
+        <hr>
+
+    {% empty %}
+
+        <p>No mood entries yet.</p>
+
+    {% endfor %}
+
+
+    <br>
+
+    <a href="{% url 'dashboard' %}">
+        Back to Dashboard
+    </a>
+
+</body>
+
+</html>

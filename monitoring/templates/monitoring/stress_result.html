@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Stress Result - MindCare AI</title>
+</head>
+
+<body>
+
+    <h1>Stress Assessment Result</h1>
+
+    <h2>Your Score: {{ score }}/30</h2>
+
+    <h2>
+        Stress Level: {{ level|title }}
+    </h2>
+
+    {% if level == 'low' %}
+
+        <p>
+            Your stress level appears to be low.
+            Keep maintaining healthy daily habits.
+        </p>
+
+    {% elif level == 'moderate' %}
+
+        <p>
+            Your stress level appears to be moderate.
+            Consider taking some time to relax and practice
+            breathing exercises.
+        </p>
+
+    {% else %}
+
+        <p>
+            Your stress level appears to be high.
+            Consider taking a break, practicing relaxation
+            exercises, and seeking appropriate support if needed.
+        </p>
+
+    {% endif %}
+
+    <br>
+
+    <a href="{% url 'stress' %}">
+        Take Assessment Again
+    </a>
+
+    <br><br>
+
+    <a href="{% url 'dashboard' %}">
+        Back to Dashboard
+    </a>
+
+</body>
+
+</html>

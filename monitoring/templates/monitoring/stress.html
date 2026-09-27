@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Stress Assessment - MindCare AI</title>
+</head>
+
+<body>
+
+    <h1>Stress Assessment</h1>
+
+    <p>
+        Answer the following questions based on how you have
+        been feeling recently.
+    </p>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <h3>1. I feel nervous or stressed.</h3>
+
+        <select name="q1" required>
+            <option value="">Select</option>
+            <option value="0">Never</option>
+            <option value="1">Sometimes</option>
+            <option value="2">Often</option>
+            <option value="3">Almost always</option>
+        </select>
+
+
+        <h3>2. I find it difficult to relax.</h3>
+
+        <select name="q2" required>
+            <option value="">Select</option>
+            <option value="0">Never</option>
+            <option value="1">Sometimes</option>
+            <option value="2">Often</option>
+            <option value="3">Almost always</option>
+        </select>
+
+
+        <h3>3. I feel overwhelmed by my responsibilities.</h3>
+
+        <select name="q3" required>
+            <option value="">Select</option>
+            <option value="0">Never</option>
+            <option value="1">Sometimes</option>
+            <option value="2">Often</option>
+            <option value="3">Almost always</option>
+        </select>
+
+
+        <h3>4. I have trouble concentrating.</h3>
+
+        <select name="q4" required>
+            <option value="">Select</option>
+            <option value="0">Never</option>
+            <option value="1">Sometimes</option>
+            <option value="2">Often</option>
+            <option value="3">Almost always</option>
+        </select>
+
+
+        <h3>5. I feel restless or unable to stay calm.</h3>
+
+        <select name="q5" required>
+            <option value="">Select</option>
+            <option value="0">Never</option>
+            <option value="1">Sometimes</option>
+            <option value="2">Often</option>
+            <option value="3">Almost always</option>
+        </select>
+
+
+        <h3>6. I feel tired because of stress.</h3>
+
+        <select name="q6" required>
+            <option value="">Select</option>
+            <option value="0">Never</option>
+            <option value="1">Sometimes</option>
+            <option value="2">Often</option>
+            <option value="3">Almost always</option>
+        </select>
+
+
+        <h3>7. I have difficulty sleeping because of my worries.</h3>
+
+        <select name="q7" required>
+            <option value="">Select</option>
+            <option value="0">Never</option>
+            <option value="1">Sometimes</option>
+            <option value="2">Often</option>
+            <option value="3">Almost always</option>
+        </select>
+
+
+        <h3>8. Small problems make me feel frustrated.</h3>
+
+        <select name="q8" required>
+            <option value="">Select</option>
+            <option value="0">Never</option>
+            <option value="1">Sometimes</option>
+            <option value="2">Often</option>
+            <option value="3">Almost always</option>
+        </select>
+
+
+        <h3>9. I worry about things that I cannot control.</h3>
+
+        <select name="q9" required>
+            <option value="">Select</option>
+            <option value="0">Never</option>
+            <option value="1">Sometimes</option>
+            <option value="2">Often</option>
+            <option value="3">Almost always</option>
+        </select>
+
+
+        <h3>10. I feel that stress is affecting my daily life.</h3>
+
+        <select name="q10" required>
+            <option value="">Select</option>
+            <option value="0">Never</option>
+            <option value="1">Sometimes</option>
+            <option value="2">Often</option>
+            <option value="3">Almost always</option>
+        </select>
+
+        <br><br>
+
+        <button type="submit">
+            Calculate Stress
+        </button>
+
+    </form>
+
+    <br>
+
+    <a href="{% url 'dashboard' %}">
+        Back to Dashboard
+    </a>
+
+</body>
+
+</html>
