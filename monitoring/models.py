@@ -135,4 +135,10 @@ class FacialExpression(models.Model):
         return self.expression
 
 
-    
+class HeartRateEntry(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    heart_rate = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.heart_rate} BPM"    

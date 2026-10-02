@@ -3,7 +3,7 @@ import os
 import django
 import time
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "AI_MENTAL_HEALTH.settings")
 django.setup()
 
 from deepface import DeepFace

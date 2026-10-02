@@ -1,12 +1,14 @@
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-
+from .models import FacialExpression
 from .models import (
     MoodEntry,
     SleepEntry,
     JournalEntry,
     StressEntry,
-    BreathingEntry
+    BreathingEntry,
+    FacialExpression
 )
 
 from textblob import TextBlob
@@ -35,10 +37,13 @@ def dashboard(request):
         user=request.user
     ).order_by('-created_at')
 
+    facial_expressions = FacialExpression.objects.filter(
+        user=request.user
+    ).order_by('-created_at')
+
     wellness_score = 0
 
     if moods:
-
         latest_mood = moods[0].mood
 
         if latest_mood == 'excellent':
@@ -57,7 +62,6 @@ def dashboard(request):
             wellness_score += 3
 
     if sleeps:
-
         latest_sleep = sleeps[0].hours
 
         if 7 <= latest_sleep <= 9:
@@ -73,7 +77,6 @@ def dashboard(request):
             wellness_score += 5
 
     if stresses:
-
         latest_stress = stresses[0].level
 
         if latest_stress == 'low':
@@ -106,6 +109,7 @@ def dashboard(request):
             'journals': journals,
             'stresses': stresses,
             'breathings': breathings,
+            'facial_expressions': facial_expressions,
             'wellness_score': wellness_score,
             'wellness_status': wellness_status
         }
@@ -265,5 +269,3 @@ def home(request):
         'home.html'
     )
 
-
-    

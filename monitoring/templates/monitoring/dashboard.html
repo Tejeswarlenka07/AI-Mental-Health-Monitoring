@@ -19,9 +19,6 @@
 
     <hr>
 
-
-    <!-- WELLNESS SCORE -->
-
     <h2>Wellness Score</h2>
 
     <h1>{{ wellness_score }}/100</h1>
@@ -30,11 +27,7 @@
 
     <hr>
 
-
-    <!-- WELLNESS SUMMARY -->
-
     <h2>Wellness Summary</h2>
-
 
     <h3>😊 Mood</h3>
 
@@ -155,50 +148,54 @@
     {% endif %}
 
 
+    <h3>📷 Facial Expression</h3>
+
+    {% if facial_expressions %}
+
+        <p>
+            Latest Expression:
+            <strong>
+                {{ facial_expressions.0.expression }}
+            </strong>
+        </p>
+
+        <p>
+            Detected At:
+            {{ facial_expressions.0.created_at }}
+        </p>
+
+    {% else %}
+
+        <p>No facial expression detected yet.</p>
+
+    {% endif %}
+
+
     <hr>
-
-
-    <!-- WELLNESS COMPONENT CHART -->
 
     <h2>Wellness Components</h2>
 
     <canvas id="wellnessChart"></canvas>
 
-
     <hr>
-
-
-    <!-- SLEEP CHART -->
 
     <h2>Sleep History</h2>
 
     <canvas id="sleepChart"></canvas>
 
-
     <hr>
-
-
-    <!-- STRESS CHART -->
 
     <h2>Stress History</h2>
 
     <canvas id="stressChart"></canvas>
 
-
     <hr>
-
-
-    <!-- MOOD CHART -->
 
     <h2>Mood History</h2>
 
     <canvas id="moodChart"></canvas>
 
-
     <hr>
-
-
-    <!-- QUICK ACTIONS -->
 
     <h2>Quick Actions</h2>
 
@@ -236,22 +233,16 @@
         My Profile
     </a>
 
-
     <hr>
-
-
-    <!-- RECENT MOOD -->
 
     <h2>Recent Mood</h2>
 
     {% for mood in moods|slice:":5" %}
 
         <p>
-
             <strong>
                 {{ mood.get_mood_display }}
             </strong>
-
         </p>
 
         <p>
@@ -271,18 +262,14 @@
     {% endfor %}
 
 
-    <!-- RECENT SLEEP -->
-
     <h2>Recent Sleep</h2>
 
     {% for sleep in sleeps|slice:":5" %}
 
         <p>
-
             <strong>
                 {{ sleep.hours }} hours
             </strong>
-
         </p>
 
         <p>
@@ -302,8 +289,6 @@
 
     {% endfor %}
 
-
-    <!-- RECENT JOURNAL -->
 
     <h2>Recent Journal Entries</h2>
 
@@ -346,18 +331,14 @@
     {% endfor %}
 
 
-    <!-- RECENT STRESS -->
-
     <h2>Recent Stress Assessments</h2>
 
     {% for stress in stresses|slice:":5" %}
 
         <p>
-
             <strong>
                 Score: {{ stress.score }}/30
             </strong>
-
         </p>
 
         <p>
@@ -378,19 +359,15 @@
     {% endfor %}
 
 
-    <!-- RECENT BREATHING -->
-
     <h2>Recent Breathing Sessions</h2>
 
     {% for breathing in breathings|slice:":5" %}
 
         <p>
-
             <strong>
                 {{ breathing.duration }}
                 minute session
             </strong>
-
         </p>
 
         <small>
@@ -406,6 +383,29 @@
     {% endfor %}
 
 
+    <h2>Recent Facial Expressions</h2>
+
+    {% for facial_expression in facial_expressions|slice:":5" %}
+
+        <p>
+            <strong>
+                {{ facial_expression.expression }}
+            </strong>
+        </p>
+
+        <small>
+            {{ facial_expression.created_at }}
+        </small>
+
+        <hr>
+
+    {% empty %}
+
+        <p>No facial expression records yet.</p>
+
+    {% endfor %}
+
+
     <br>
 
     <a href="{% url 'logout' %}">
@@ -413,18 +413,10 @@
     </a>
 
 
-    <!-- CHART JAVASCRIPT -->
-
     <script>
-
-
-        /* =========================
-           WELLNESS COMPONENT CHART
-        ========================= */
 
         const wellnessCtx =
             document.getElementById('wellnessChart');
-
 
         new Chart(wellnessCtx, {
 
@@ -465,7 +457,6 @@
 
                         {% endif %},
 
-
                         {% if sleeps %}
 
                             {% if sleeps.0.hours >= 7 and sleeps.0.hours <= 9 %}
@@ -486,7 +477,6 @@
 
                         {% endif %},
 
-
                         {% if stresses %}
 
                             {% if stresses.0.level == 'low' %}
@@ -502,7 +492,6 @@
                             0
 
                         {% endif %},
-
 
                         {% if breathings %}
                             20
@@ -539,14 +528,8 @@
         });
 
 
-
-        /* =========================
-           SLEEP CHART
-        ========================= */
-
         const sleepCtx =
             document.getElementById('sleepChart');
-
 
         new Chart(sleepCtx, {
 
@@ -607,14 +590,8 @@
         });
 
 
-
-        /* =========================
-           STRESS CHART
-        ========================= */
-
         const stressCtx =
             document.getElementById('stressChart');
-
 
         new Chart(stressCtx, {
 
@@ -675,14 +652,8 @@
         });
 
 
-
-        /* =========================
-           MOOD CHART
-        ========================= */
-
         const moodCtx =
             document.getElementById('moodChart');
-
 
         new Chart(moodCtx, {
 
