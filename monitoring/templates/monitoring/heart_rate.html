@@ -1,0 +1,48 @@
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Heart Rate - MindCare AI</title>
+</head>
+<body>
+
+    <h1>Heart Rate Monitor</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label>Enter Heart Rate (BPM):</label>
+        <input type="number" name="heart_rate" min="30" max="220" required>
+
+        <button type="submit">Save Heart Rate</button>
+    </form>
+
+    <hr>
+
+    <h2>Heart Rate History</h2>
+
+    {% if heart_rates %}
+        <table border="1" cellpadding="10">
+            <tr>
+                <th>Heart Rate</th>
+                <th>Date and Time</th>
+            </tr>
+
+            {% for entry in heart_rates %}
+            <tr>
+                <td>{{ entry.heart_rate }} BPM</td>
+                <td>{{ entry.created_at|date:"d M Y, h:i A" }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No heart-rate records available.</p>
+    {% endif %}
+
+    <br>
+
+    <a href="/monitoring/">Back to Dashboard</a>
+
+</body>
+</html>
+```

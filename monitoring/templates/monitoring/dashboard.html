@@ -1,738 +1,248 @@
 <!DOCTYPE html>
+
 <html>
-
 <head>
-
     <title>Dashboard - MindCare AI</title>
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 </head>
-
 <body>
+<h1>Welcome, {{ request.user.username }}</h1>
 
-    <h1>Welcome, {{ request.user.username }} 👋</h1>
+<h2>MindCare AI Dashboard</h2>
 
-    <p>
-        Your personal mental wellness dashboard
-    </p>
-
-    <hr>
+<div class="card">
 
     <h2>Wellness Score</h2>
 
     <h1>{{ wellness_score }}/100</h1>
 
-    <h3>{{ wellness_status }}</h3>
+    <p>{{ wellness_status }}</p>
 
-    <hr>
+</div>
 
-    <h2>Wellness Summary</h2>
+<div class="card">
 
-    <h3>😊 Mood</h3>
+    <h2>AI Distress Prediction</h2>
+
+    <h1>{{ dashboard_distress_level }}</h1>
+
+    <p>AI estimated distress level based on your available wellness data.</p>
+
+    <a href="{% url 'distress_prediction' %}">
+        View Details
+    </a>
+
+</div>
+
+<h2>Wellness Chart</h2>
+
+<canvas id="wellnessChart"></canvas>
+
+<h2>Sleep Chart</h2>
+
+<canvas id="sleepChart"></canvas>
+
+<h2>Stress Chart</h2>
+
+<canvas id="stressChart"></canvas>
+
+<h2>Mood Chart</h2>
+
+<canvas id="moodChart"></canvas>
+
+<h2>Latest Data</h2>
+
+<div class="card">
+
+    <h3>Mood</h3>
 
     {% if moods %}
-
-        <p>
-            Latest Mood:
-            <strong>
-                {{ moods.0.get_mood_display }}
-            </strong>
-        </p>
-
+        <p>{{ moods.0.mood }}</p>
     {% else %}
-
-        <p>No mood recorded</p>
-
+        <p>No mood recorded yet.</p>
     {% endif %}
 
+    <a href="{% url 'mood' %}">Add Mood</a>
 
-    <h3>😴 Sleep</h3>
+</div>
+
+<div class="card">
+
+    <h3>Sleep</h3>
 
     {% if sleeps %}
-
-        <p>
-            Latest Sleep:
-            <strong>
-                {{ sleeps.0.hours }} hours
-            </strong>
-        </p>
-
-        <p>
-            Quality:
-            {{ sleeps.0.quality }}/5
-        </p>
-
+        <p>{{ sleeps.0.hours }} hours</p>
+        <p>Quality: {{ sleeps.0.quality }}</p>
     {% else %}
-
-        <p>No sleep recorded</p>
-
+        <p>No sleep recorded yet.</p>
     {% endif %}
 
+    <a href="{% url 'sleep' %}">Add Sleep</a>
 
-    <h3>😰 Stress</h3>
+</div>
 
-    {% if stresses %}
+<div class="card">
 
-        <p>
-            Latest Stress:
-            <strong>
-                {{ stresses.0.level|title }}
-            </strong>
-        </p>
-
-        <p>
-            Score:
-            {{ stresses.0.score }}/30
-        </p>
-
-    {% else %}
-
-        <p>No stress assessment yet</p>
-
-    {% endif %}
-
-
-    <h3>🫁 Breathing</h3>
-
-    {% if breathings %}
-
-        <p>
-            <strong>
-                {{ breathings|length }}
-            </strong>
-            breathing session(s) completed
-        </p>
-
-        <p>
-            Latest session:
-            <strong>
-                {{ breathings.0.duration }} minutes
-            </strong>
-        </p>
-
-    {% else %}
-
-        <p>No breathing sessions yet</p>
-
-    {% endif %}
-
-
-    <h3>📔 Journal</h3>
+    <h3>Journal</h3>
 
     {% if journals %}
-
-        <p>
-            {{ journals|length }}
-            journal entry/entries
-        </p>
-
-        <p>
-            Latest AI Sentiment:
-            <strong>
-                {{ journals.0.sentiment }}
-            </strong>
-        </p>
-
-        <p>
-            Sentiment Score:
-            <strong>
-                {{ journals.0.sentiment_score }}
-            </strong>
-        </p>
-
+        <p>{{ journals.0.sentiment }}</p>
     {% else %}
-
-        <p>No journal entries yet</p>
-
+        <p>No journal entry yet.</p>
     {% endif %}
 
+    <a href="{% url 'journal' %}">Open Journal</a>
 
-    <h3>📷 Facial Expression</h3>
+</div>
+
+<div class="card">
+
+    <h3>Stress</h3>
+
+    {% if stresses %}
+        <p>Score: {{ stresses.0.score }}</p>
+        <p>Level: {{ stresses.0.level }}</p>
+    {% else %}
+        <p>No stress assessment yet.</p>
+    {% endif %}
+
+    <a href="{% url 'stress' %}">Take Assessment</a>
+
+</div>
+
+<div class="card">
+
+    <h3>Breathing Exercise</h3>
+
+    {% if breathings %}
+        <p>Completed sessions: {{ breathings|length }}</p>
+    {% else %}
+        <p>No breathing exercise completed yet.</p>
+    {% endif %}
+
+    <a href="{% url 'breathing' %}">Start Exercise</a>
+
+</div>
+
+<div class="card">
+
+    <h3>Facial Expression</h3>
 
     {% if facial_expressions %}
-
-        <p>
-            Latest Expression:
-            <strong>
-                {{ facial_expressions.0.expression }}
-            </strong>
-        </p>
-
-        <p>
-            Detected At:
-            {{ facial_expressions.0.created_at }}
-        </p>
-
+        <p>{{ facial_expressions.0.expression }}</p>
     {% else %}
-
-        <p>No facial expression detected yet.</p>
-
+        <p>No facial expression recorded yet.</p>
     {% endif %}
 
+</div>
 
-    <hr>
+<div class="card">
 
-    <h2>Wellness Components</h2>
+    <h3>Heart Rate</h3>
 
-    <canvas id="wellnessChart"></canvas>
+    {% if heart_rates %}
+        <h2>{{ heart_rates.0.heart_rate }} BPM</h2>
+        <p>Latest reading</p>
+    {% else %}
+        <p>No heart rate recorded yet.</p>
+    {% endif %}
 
-    <hr>
-
-    <h2>Sleep History</h2>
-
-    <canvas id="sleepChart"></canvas>
-
-    <hr>
-
-    <h2>Stress History</h2>
-
-    <canvas id="stressChart"></canvas>
-
-    <hr>
-
-    <h2>Mood History</h2>
-
-    <canvas id="moodChart"></canvas>
-
-    <hr>
-
-    <h2>Quick Actions</h2>
-
-    <a href="{% url 'mood' %}">
-        Track Mood
+    <a href="{% url 'heart_rate' %}">
+        Add Heart Rate
     </a>
 
-    <br><br>
-
-    <a href="{% url 'sleep' %}">
-        Track Sleep
-    </a>
-
-    <br><br>
-
-    <a href="{% url 'journal' %}">
-        Write Journal
-    </a>
-
-    <br><br>
-
-    <a href="{% url 'stress' %}">
-        Stress Assessment
-    </a>
-
-    <br><br>
-
-    <a href="{% url 'breathing' %}">
-        Breathing Exercise
-    </a>
-
-    <br><br>
-
-    <a href="{% url 'profile' %}">
-        My Profile
-    </a>
-
-    <hr>
-
-    <h2>Recent Mood</h2>
-
-    {% for mood in moods|slice:":5" %}
-
-        <p>
-            <strong>
-                {{ mood.get_mood_display }}
-            </strong>
-        </p>
-
-        <p>
-            {{ mood.note }}
-        </p>
-
-        <small>
-            {{ mood.created_at }}
-        </small>
-
-        <hr>
-
-    {% empty %}
-
-        <p>No mood entries yet.</p>
-
-    {% endfor %}
-
-
-    <h2>Recent Sleep</h2>
-
-    {% for sleep in sleeps|slice:":5" %}
-
-        <p>
-            <strong>
-                {{ sleep.hours }} hours
-            </strong>
-        </p>
-
-        <p>
-            Sleep Quality:
-            {{ sleep.quality }}/5
-        </p>
-
-        <small>
-            {{ sleep.created_at }}
-        </small>
-
-        <hr>
-
-    {% empty %}
-
-        <p>No sleep records yet.</p>
-
-    {% endfor %}
-
-
-    <h2>Recent Journal Entries</h2>
-
-    {% for journal in journals|slice:":5" %}
-
-        <h3>
-            {{ journal.title }}
-        </h3>
-
-        <p>
-            {{ journal.content }}
-        </p>
-
-        <p>
-            <strong>
-                AI Sentiment:
-            </strong>
-
-            {{ journal.sentiment }}
-        </p>
-
-        <p>
-            <strong>
-                Sentiment Score:
-            </strong>
-
-            {{ journal.sentiment_score }}
-        </p>
-
-        <small>
-            {{ journal.created_at }}
-        </small>
-
-        <hr>
-
-    {% empty %}
-
-        <p>No journal entries yet.</p>
-
-    {% endfor %}
-
-
-    <h2>Recent Stress Assessments</h2>
-
-    {% for stress in stresses|slice:":5" %}
-
-        <p>
-            <strong>
-                Score: {{ stress.score }}/30
-            </strong>
-        </p>
-
-        <p>
-            Stress Level:
-            {{ stress.level|title }}
-        </p>
-
-        <small>
-            {{ stress.created_at }}
-        </small>
-
-        <hr>
-
-    {% empty %}
-
-        <p>No stress assessments yet.</p>
-
-    {% endfor %}
-
-
-    <h2>Recent Breathing Sessions</h2>
-
-    {% for breathing in breathings|slice:":5" %}
-
-        <p>
-            <strong>
-                {{ breathing.duration }}
-                minute session
-            </strong>
-        </p>
-
-        <small>
-            {{ breathing.created_at }}
-        </small>
-
-        <hr>
-
-    {% empty %}
-
-        <p>No breathing sessions yet.</p>
-
-    {% endfor %}
-
-
-    <h2>Recent Facial Expressions</h2>
-
-    {% for facial_expression in facial_expressions|slice:":5" %}
-
-        <p>
-            <strong>
-                {{ facial_expression.expression }}
-            </strong>
-        </p>
-
-        <small>
-            {{ facial_expression.created_at }}
-        </small>
-
-        <hr>
-
-    {% empty %}
-
-        <p>No facial expression records yet.</p>
-
-    {% endfor %}
-
-
-    <br>
-
-    <a href="{% url 'logout' %}">
-        Logout
-    </a>
-
-
-    <script>
-
-        const wellnessCtx =
-            document.getElementById('wellnessChart');
-
-        new Chart(wellnessCtx, {
-
-            type: 'bar',
-
-            data: {
-
-                labels: [
-                    'Mood',
-                    'Sleep',
-                    'Stress',
-                    'Breathing'
-                ],
-
-                datasets: [{
-
-                    label: 'Score',
-
-                    data: [
-
-                        {% if moods %}
-
-                            {% if moods.0.mood == 'excellent' %}
-                                25
-                            {% elif moods.0.mood == 'good' %}
-                                20
-                            {% elif moods.0.mood == 'okay' %}
-                                15
-                            {% elif moods.0.mood == 'sad' %}
-                                8
-                            {% else %}
-                                3
-                            {% endif %}
-
-                        {% else %}
-
-                            0
-
-                        {% endif %},
-
-                        {% if sleeps %}
-
-                            {% if sleeps.0.hours >= 7 and sleeps.0.hours <= 9 %}
-                                25
-                            {% elif sleeps.0.hours >= 6 and sleeps.0.hours < 7 %}
-                                20
-                            {% elif sleeps.0.hours > 9 and sleeps.0.hours <= 10 %}
-                                20
-                            {% elif sleeps.0.hours >= 5 and sleeps.0.hours < 6 %}
-                                12
-                            {% else %}
-                                5
-                            {% endif %}
-
-                        {% else %}
-
-                            0
-
-                        {% endif %},
-
-                        {% if stresses %}
-
-                            {% if stresses.0.level == 'low' %}
-                                30
-                            {% elif stresses.0.level == 'moderate' %}
-                                18
-                            {% else %}
-                                5
-                            {% endif %}
-
-                        {% else %}
-
-                            0
-
-                        {% endif %},
-
-                        {% if breathings %}
-                            20
-                        {% else %}
-                            0
-                        {% endif %}
-
-                    ],
-
-                    borderWidth: 1
-
-                }]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                scales: {
-
-                    y: {
-
-                        beginAtZero: true,
-
-                        max: 30
-
-                    }
-
-                }
-
-            }
-
-        });
-
-
-        const sleepCtx =
-            document.getElementById('sleepChart');
-
-        new Chart(sleepCtx, {
-
-            type: 'line',
-
-            data: {
-
-                labels: [
-
+</div>
+
+<br>
+
+<a href="{% url 'profile' %}">Profile</a>
+
+<script>
+
+    const wellnessChart = document.getElementById('wellnessChart');
+
+    new Chart(wellnessChart, {
+        type: 'line',
+        data: {
+            labels: ['Wellness'],
+            datasets: [{
+                label: 'Wellness Score',
+                data: [{{ wellness_score }}]
+            }]
+        }
+    });
+
+    const sleepChart = document.getElementById('sleepChart');
+
+    new Chart(sleepChart, {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for sleep in sleeps %}
+                    '{{ sleep.created_at|date:"d M" }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Sleep Hours',
+                data: [
                     {% for sleep in sleeps %}
-
-                        "{{ sleep.created_at|date:'d M' }}",
-
+                        {{ sleep.hours }},
                     {% endfor %}
+                ]
+            }]
+        }
+    });
 
-                ],
+    const stressChart = document.getElementById('stressChart');
 
-                datasets: [{
-
-                    label: 'Sleep Hours',
-
-                    data: [
-
-                        {% for sleep in sleeps %}
-
-                            {{ sleep.hours }},
-
-                        {% endfor %}
-
-                    ],
-
-                    borderWidth: 2,
-
-                    tension: 0.3
-
-                }]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                scales: {
-
-                    y: {
-
-                        beginAtZero: true,
-
-                        max: 12
-
-                    }
-
-                }
-
-            }
-
-        });
-
-
-        const stressCtx =
-            document.getElementById('stressChart');
-
-        new Chart(stressCtx, {
-
-            type: 'line',
-
-            data: {
-
-                labels: [
-
+    new Chart(stressChart, {
+        type: 'line',
+        data: {
+            labels: [
+                {% for stress in stresses %}
+                    '{{ stress.created_at|date:"d M" }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Stress Score',
+                data: [
                     {% for stress in stresses %}
-
-                        "{{ stress.created_at|date:'d M' }}",
-
+                        {{ stress.score }},
                     {% endfor %}
+                ]
+            }]
+        }
+    });
 
-                ],
+    const moodChart = document.getElementById('moodChart');
 
-                datasets: [{
-
-                    label: 'Stress Score',
-
-                    data: [
-
-                        {% for stress in stresses %}
-
-                            {{ stress.score }},
-
-                        {% endfor %}
-
-                    ],
-
-                    borderWidth: 2,
-
-                    tension: 0.3
-
-                }]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                scales: {
-
-                    y: {
-
-                        beginAtZero: true,
-
-                        max: 30
-
-                    }
-
-                }
-
-            }
-
-        });
-
-
-        const moodCtx =
-            document.getElementById('moodChart');
-
-        new Chart(moodCtx, {
-
-            type: 'line',
-
-            data: {
-
-                labels: [
-
+    new Chart(moodChart, {
+        type: 'line',
+        data: {
+            labels: [
+                {% for mood in moods %}
+                    '{{ mood.created_at|date:"d M" }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Mood',
+                data: [
                     {% for mood in moods %}
-
-                        "{{ mood.created_at|date:'d M' }}",
-
+                        {% if mood.mood == 'very_sad' %}
+                            1,
+                        {% elif mood.mood == 'sad' %}
+                            2,
+                        {% elif mood.mood == 'okay' %}
+                            3,
+                        {% elif mood.mood == 'good' %}
+                            4,
+                        {% else %}
+                            5,
+                        {% endif %}
                     {% endfor %}
+                ]
+            }]
+        }
+    });
 
-                ],
-
-                datasets: [{
-
-                    label: 'Mood Level',
-
-                    data: [
-
-                        {% for mood in moods %}
-
-                            {% if mood.mood == 'excellent' %}
-                                5
-                            {% elif mood.mood == 'good' %}
-                                4
-                            {% elif mood.mood == 'okay' %}
-                                3
-                            {% elif mood.mood == 'sad' %}
-                                2
-                            {% else %}
-                                1
-                            {% endif %},
-
-                        {% endfor %}
-
-                    ],
-
-                    borderWidth: 2,
-
-                    tension: 0.3
-
-                }]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                scales: {
-
-                    y: {
-
-                        beginAtZero: true,
-
-                        min: 0,
-
-                        max: 5,
-
-                        ticks: {
-
-                            stepSize: 1
-
-                        }
-
-                    }
-
-                }
-
-            }
-
-        });
-
-    </script>
-
-</body>
-
-</html>
+</script>

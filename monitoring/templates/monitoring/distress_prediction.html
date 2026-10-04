@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>AI Distress Prediction - MindCare AI</title>
+
+</head>
+
+<body>
+
+    <h1>AI Distress Prediction</h1>
+
+    <h2>Predicted Distress Level</h2>
+
+    <h1>{{ distress_level }}</h1>
+
+    <hr>
+
+    <h2>Data Used by AI</h2>
+
+    <p>Mood: {{ mood }}</p>
+
+    <p>Sleep Hours: {{ sleep_hours }}</p>
+
+    <p>Sleep Quality: {{ sleep_quality }}</p>
+
+    <p>Stress Score: {{ stress_score }}</p>
+
+    <p>Journal Sentiment: {{ journal_sentiment }}</p>
+
+    <p>Facial Expression: {{ facial_expression }}</p>
+
+    <p>Heart Rate: {{ heart_rate }} BPM</p>
+
+    <hr>
+
+    <a href="{% url 'dashboard' %}">
+        Back to Dashboard
+    </a>
+
+</body>
+
+</html>
+

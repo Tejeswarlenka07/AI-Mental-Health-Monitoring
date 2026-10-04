@@ -142,3 +142,4 @@ class HeartRateEntry(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.heart_rate} BPM"    
+    
