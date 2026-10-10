@@ -1,46 +1,194 @@
+{% load static %}
 
 <!DOCTYPE html>
+
 <html>
 
 <head>
 
-    <title>AI Distress Prediction - MindCare AI</title>
+```
+<title>AI Distress Prediction - MindCare AI</title>
+
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+```
 
 </head>
 
 <body>
 
-    <h1>AI Distress Prediction</h1>
+```
+<nav class="navbar">
 
-    <h2>Predicted Distress Level</h2>
+    <div>
+        <h2>MindCare AI</h2>
+    </div>
 
-    <h1>{{ distress_level }}</h1>
+    <div>
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+    </div>
 
-    <hr>
+</nav>
 
-    <h2>Data Used by AI</h2>
+<main class="container">
 
-    <p>Mood: {{ mood }}</p>
+    <section class="ai-card ai-glow">
 
-    <p>Sleep Hours: {{ sleep_hours }}</p>
+        <div class="ai-badge">
+            AI DISTRESS ANALYSIS
+        </div>
 
-    <p>Sleep Quality: {{ sleep_quality }}</p>
+        <h1>AI Distress Prediction</h1>
 
-    <p>Stress Score: {{ stress_score }}</p>
+        <p>
+            Your current wellness data has been analyzed by the
+            MindCare AI prediction system.
+        </p>
 
-    <p>Journal Sentiment: {{ journal_sentiment }}</p>
+        <div class="wellness-card">
 
-    <p>Facial Expression: {{ facial_expression }}</p>
+            <div class="data-label">
+                PREDICTED DISTRESS LEVEL
+            </div>
 
-    <p>Heart Rate: {{ heart_rate }} BPM</p>
+            <div class="wellness-score distress-level">
+                {{ distress_level }}
+            </div>
 
-    <hr>
+        </div>
 
-    <a href="{% url 'dashboard' %}">
-        Back to Dashboard
-    </a>
+    </section>
+
+    <section>
+
+        <div class="section-title">
+
+            <h2>Data Used by AI</h2>
+
+            <p>
+                The prediction is based on your latest wellness indicators.
+            </p>
+
+        </div>
+
+        <div class="grid">
+
+            <div class="data-card">
+
+                <div class="data-label">
+                    MOOD
+                </div>
+
+                <div class="data-value">
+                    {{ mood }}
+                </div>
+
+            </div>
+
+            <div class="data-card">
+
+                <div class="data-label">
+                    SLEEP HOURS
+                </div>
+
+                <div class="data-value">
+                    {{ sleep_hours }}
+                </div>
+
+            </div>
+
+            <div class="data-card">
+
+                <div class="data-label">
+                    SLEEP QUALITY
+                </div>
+
+                <div class="data-value">
+                    {{ sleep_quality }}
+                </div>
+
+            </div>
+
+            <div class="data-card">
+
+                <div class="data-label">
+                    STRESS SCORE
+                </div>
+
+                <div class="data-value">
+                    {{ stress_score }}
+                </div>
+
+            </div>
+
+            <div class="data-card">
+
+                <div class="data-label">
+                    JOURNAL SENTIMENT
+                </div>
+
+                <div class="data-value">
+                    {{ journal_sentiment }}
+                </div>
+
+            </div>
+
+            <div class="data-card">
+
+                <div class="data-label">
+                    FACIAL EXPRESSION
+                </div>
+
+                <div class="data-value">
+                    {{ facial_expression }}
+                </div>
+
+            </div>
+
+            <div class="data-card">
+
+                <div class="data-label">
+                    HEART RATE
+                </div>
+
+                <div class="data-value">
+                    {{ heart_rate }} BPM
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <div class="recommendation-card">
+
+        <h2>MindCare AI Insight</h2>
+
+        <p>
+            This prediction is generated from the wellness information
+            currently available in your account. Continue recording your
+            daily data for a more complete picture of your wellness trends.
+        </p>
+
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+
+        <a href="{% url 'dashboard' %}" class="button button-secondary">
+            Back to Dashboard
+        </a>
+
+    </div>
+
+</main>
+
+<footer class="footer">
+
+    <p>MindCare AI • AI-powered wellness monitoring.</p>
+
+</footer>
+```
 
 </body>
 
 </html>
-

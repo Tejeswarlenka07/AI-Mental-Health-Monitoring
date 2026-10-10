@@ -1,48 +1,142 @@
-```html
+{% load static %}
+
 <!DOCTYPE html>
+
 <html>
+
 <head>
-    <title>Heart Rate - MindCare AI</title>
+
+```
+<title>Heart Rate - MindCare AI</title>
+
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+```
+
 </head>
+
 <body>
 
-    <h1>Heart Rate Monitor</h1>
+```
+<nav class="navbar">
 
-    <form method="POST">
-        {% csrf_token %}
+    <div>
+        <h2>MindCare AI</h2>
+    </div>
 
-        <label>Enter Heart Rate (BPM):</label>
-        <input type="number" name="heart_rate" min="30" max="220" required>
+    <div>
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+    </div>
 
-        <button type="submit">Save Heart Rate</button>
-    </form>
+</nav>
 
-    <hr>
+<main class="container">
 
-    <h2>Heart Rate History</h2>
+    <section class="ai-card ai-glow">
 
-    {% if heart_rates %}
-        <table border="1" cellpadding="10">
-            <tr>
-                <th>Heart Rate</th>
-                <th>Date and Time</th>
-            </tr>
+        <div class="ai-badge">
+            HEART RATE MONITOR
+        </div>
 
-            {% for entry in heart_rates %}
-            <tr>
-                <td>{{ entry.heart_rate }} BPM</td>
-                <td>{{ entry.created_at|date:"d M Y, h:i A" }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    {% else %}
-        <p>No heart-rate records available.</p>
-    {% endif %}
+        <h1>Heart Rate Monitor</h1>
 
-    <br>
+        <p>
+            Enter your current heart rate to track your cardiovascular
+            wellness over time.
+        </p>
 
-    <a href="/monitoring/">Back to Dashboard</a>
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <label>Heart Rate (BPM)</label>
+
+            <input
+                type="number"
+                name="heart_rate"
+                min="30"
+                max="220"
+                placeholder="Enter BPM"
+                required
+            >
+
+            <button type="submit" class="button">
+                Save Heart Rate
+            </button>
+
+        </form>
+
+    </section>
+
+    <section>
+
+        <div class="section-title">
+
+            <h2>Heart Rate History</h2>
+
+            <p>Your previously recorded heart-rate measurements</p>
+
+        </div>
+
+        {% if heart_rates %}
+
+            <div class="history-card">
+
+                {% for entry in heart_rates %}
+
+                    <div class="data-card">
+
+                        <div class="data-label">
+                            HEART RATE
+                        </div>
+
+                        <div class="data-value">
+                            {{ entry.heart_rate }} BPM
+                        </div>
+
+                        <div class="history-date">
+                            {{ entry.created_at|date:"d M Y, h:i A" }}
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="data-card">
+
+                <h3>No heart-rate records available.</h3>
+
+                <p>
+                    Enter your first heart-rate reading to start tracking
+                    your cardiovascular data.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+    <div style="text-align: center; margin-top: 30px;">
+
+        <a href="{% url 'dashboard' %}" class="button button-secondary">
+            Back to Dashboard
+        </a>
+
+    </div>
+
+</main>
+
+<footer class="footer">
+
+    <p>MindCare AI • Monitor your wellness over time.</p>
+
+</footer>
+```
 
 </body>
+
 </html>
-```

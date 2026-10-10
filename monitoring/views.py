@@ -8,6 +8,8 @@ import os
 import joblib
 import pandas as pd
 
+from textblob import TextBlob
+
 from .models import (
     MoodEntry,
     SleepEntry,
@@ -16,214 +18,221 @@ from .models import (
     BreathingEntry,
     FacialExpression,
     HeartRateEntry,
+    Recommendation,
 )
-
-from textblob import TextBlob
 
 
 @login_required
 def dashboard(request):
-    moods = MoodEntry.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
+    moods = MoodEntry.objects.filter(user=request.user).order_by('-created_at')[:10]
+    sleeps = SleepEntry.objects.filter(user=request.user).order_by('-created_at')[:10]
+    journals = JournalEntry.objects.filter(user=request.user).order_by('-created_at')[:10]
+    stresses = StressEntry.objects.filter(user=request.user).order_by('-created_at')[:10]
+    breathings = BreathingEntry.objects.filter(user=request.user).order_by('-created_at')[:10]
+    facial_expressions = FacialExpression.objects.filter(user=request.user).order_by('-created_at')[:10]
+    heart_rates = HeartRateEntry.objects.filter(user=request.user).order_by('-created_at')[:10]
 
-    sleeps = SleepEntry.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
+    latest_mood = moods[0] if moods else None
+    latest_sleep = sleeps[0] if sleeps else None
+    latest_stress = stresses[0] if stresses else None
+    latest_breathing = breathings[0] if breathings else None
+    latest_journal = journals[0] if journals else None
+    latest_facial = facial_expressions[0] if facial_expressions else None
+    latest_heart_rate = heart_rates[0] if heart_rates else None
 
-    journals = JournalEntry.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
-
-    stresses = StressEntry.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
-
-    breathings = BreathingEntry.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
-
-    facial_expressions = FacialExpression.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
-
-    heart_rates = HeartRateEntry.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
-
+    # ---------- Wellness score ----------
     wellness_score = 0
 
-    if moods:
-        latest_mood = moods[0].mood
+    if latest_mood:
+        mood_scores = {
+            'excellent': 25,
+            'good': 20,
+            'okay': 15,
+            'sad': 10,
+            'very_sad': 5,
+        }
+        wellness_score += mood_scores.get(latest_mood.mood, 0)
 
-        if latest_mood == 'excellent':
+    if latest_sleep:
+        if latest_sleep.hours >= 7:
             wellness_score += 25
-        elif latest_mood == 'good':
+        elif latest_sleep.hours >= 6:
             wellness_score += 20
-        elif latest_mood == 'okay':
-            wellness_score += 15
-        elif latest_mood == 'sad':
-            wellness_score += 8
-        else:
-            wellness_score += 3
+        elif latest_sleep.hours >= 5:
+            wellness_score += 10
 
-    if sleeps:
-        latest_sleep = sleeps[0].hours
-
-        if 7 <= latest_sleep <= 9:
-            wellness_score += 25
-        elif 6 <= latest_sleep < 7 or 9 < latest_sleep <= 10:
-            wellness_score += 20
-        elif 5 <= latest_sleep < 6:
-            wellness_score += 12
-        else:
-            wellness_score += 5
-
-    if stresses:
-        latest_stress = stresses[0].level
-
-        if latest_stress == 'low':
+    if latest_stress:
+        if latest_stress.score <= 10:
             wellness_score += 30
-        elif latest_stress == 'moderate':
-            wellness_score += 18
+        elif latest_stress.score <= 20:
+            wellness_score += 20
         else:
-            wellness_score += 5
+            wellness_score += 10
 
-    if breathings:
+    if latest_breathing:
         wellness_score += 20
 
     if wellness_score >= 75:
-        wellness_status = 'Good'
+        wellness_status = "Good"
     elif wellness_score >= 50:
-        wellness_status = 'Moderate'
+        wellness_status = "Moderate"
     else:
-        wellness_status = 'Needs Attention'
+        wellness_status = "Needs Attention"
 
-    model_path = os.path.join(
-        settings.BASE_DIR,
-        'ai_model',
-        'distress_model.pkl'
-    )
+    # ---------- Model input defaults ----------
+    prediction = "Prediction unavailable"
 
-    dashboard_distress_level = 'Model not trained yet'
+    model_path = os.path.join(settings.BASE_DIR, 'ai_model', 'distress_model.pkl')
 
+    mood = 3
+    sleep_hours = 7
+    sleep_quality = 3
+    stress_score = 10
+    journal_sentiment = 0
+    facial_expression = 3
+    heart_rate = 75
+
+    if latest_mood:
+        mood_map = {
+            'excellent': 5,
+            'good': 4,
+            'okay': 3,
+            'sad': 2,
+            'very_sad': 1,
+        }
+        mood = mood_map.get(latest_mood.mood, 3)
+
+    if latest_sleep:
+        sleep_hours = float(latest_sleep.hours)
+        sleep_quality = int(latest_sleep.quality)
+
+    if latest_stress:
+        stress_score = latest_stress.score
+
+    if latest_journal:
+        journal_sentiment = TextBlob(latest_journal.content).sentiment.polarity
+
+    if latest_facial:
+        expression_map = {
+            'happy': 5,
+            'surprise': 5,
+            'neutral': 3,
+            'sad': 1,
+            'fear': 1,
+            'angry': 1,
+            'disgust': 1,
+        }
+        facial_expression = expression_map.get(latest_facial.expression.lower(), 3)
+
+    if latest_heart_rate:
+        heart_rate = latest_heart_rate.heart_rate
+
+    # ---------- AI prediction ----------
     if os.path.exists(model_path):
         try:
             model = joblib.load(model_path)
 
-            if moods:
-                mood_values = {
-                    'very_sad': 1,
-                    'sad': 2,
-                    'okay': 3,
-                    'good': 4,
-                    'excellent': 5,
-                }
+            data = pd.DataFrame([{
+                'mood': mood,
+                'sleep_hours': sleep_hours,
+                'sleep_quality': sleep_quality,
+                'stress_score': stress_score,
+                'journal_sentiment': journal_sentiment,
+                'facial_expression': facial_expression,
+                'heart_rate': heart_rate,
+            }])
 
-                dashboard_mood = mood_values.get(
-                    moods[0].mood,
-                    3
-                )
+            result = model.predict(data)[0]
+
+            if result == 0:
+                prediction = "Low Distress"
+            elif result == 1:
+                prediction = "Moderate Distress"
             else:
-                dashboard_mood = 3
-
-            if sleeps:
-                dashboard_sleep_hours = sleeps[0].hours
-                dashboard_sleep_quality = sleeps[0].quality
-            else:
-                dashboard_sleep_hours = 7
-                dashboard_sleep_quality = 3
-
-            if stresses:
-                dashboard_stress_score = stresses[0].score
-            else:
-                dashboard_stress_score = 10
-
-            if journals:
-                dashboard_journal_sentiment = journals[0].sentiment_score
-
-                if dashboard_journal_sentiment is None:
-                    dashboard_journal_sentiment = 0
-
-                if dashboard_journal_sentiment > 0:
-                    dashboard_journal_sentiment = 1
-                elif dashboard_journal_sentiment < 0:
-                    dashboard_journal_sentiment = -1
-                else:
-                    dashboard_journal_sentiment = 0
-            else:
-                dashboard_journal_sentiment = 0
-
-            if facial_expressions:
-                expression = facial_expressions[0].expression.lower()
-
-                if expression in ['happy', 'surprise']:
-                    dashboard_facial_expression = 5
-                elif expression == 'neutral':
-                    dashboard_facial_expression = 3
-                elif expression in ['sad', 'fear', 'angry', 'disgust']:
-                    dashboard_facial_expression = 1
-                else:
-                    dashboard_facial_expression = 3
-            else:
-                dashboard_facial_expression = 3
-
-            if heart_rates:
-                dashboard_heart_rate = heart_rates[0].heart_rate
-            else:
-                dashboard_heart_rate = 75
-
-            dashboard_input = pd.DataFrame([
-                {
-                    'mood': dashboard_mood,
-                    'sleep_hours': dashboard_sleep_hours,
-                    'sleep_quality': dashboard_sleep_quality,
-                    'stress_score': dashboard_stress_score,
-                    'journal_sentiment': dashboard_journal_sentiment,
-                    'facial_expression': dashboard_facial_expression,
-                    'heart_rate': dashboard_heart_rate,
-                }
-            ])
-
-            dashboard_prediction = model.predict(
-                dashboard_input
-            )[0]
-
-            if dashboard_prediction == 0:
-                dashboard_distress_level = 'Low'
-            elif dashboard_prediction == 1:
-                dashboard_distress_level = 'Moderate'
-            else:
-                dashboard_distress_level = 'High'
+                prediction = "High Distress"
 
         except Exception:
-            dashboard_distress_level = 'Prediction unavailable'
+            prediction = "Prediction unavailable"
 
-    context = {
-        'moods': moods,
-        'sleeps': sleeps,
-        'journals': journals,
-        'stresses': stresses,
-        'breathings': breathings,
-        'facial_expressions': facial_expressions,
-        'heart_rates': heart_rates,
-        'wellness_score': wellness_score,
-        'wellness_status': wellness_status,
-        'dashboard_distress_level': dashboard_distress_level,
-    }
+    # ---------- Recommendations ----------
+    recommendations_list = []
+
+    if latest_mood and latest_mood.mood in ['sad', 'very_sad']:
+        recommendations_list.append(
+            'Try a relaxing activity such as listening to music, taking a walk, or talking to someone you trust.'
+        )
+
+    if sleep_hours < 6:
+        recommendations_list.append(
+            'Your sleep duration is low. Try maintaining a regular sleep schedule and aim for 7 to 9 hours of sleep.'
+        )
+
+    if stress_score > 20:
+        recommendations_list.append(
+            'Your stress level is high. Try the breathing exercise and take short breaks during the day.'
+        )
+    elif stress_score > 10:
+        recommendations_list.append(
+            'Your stress level is moderate. Practice relaxation or breathing exercises regularly.'
+        )
+
+    if journal_sentiment < 0:
+        recommendations_list.append(
+            'Your recent journal entry appears negative. Continue writing your thoughts and consider talking to someone you trust.'
+        )
+
+    if latest_facial:
+        expression = latest_facial.expression.lower()
+        if expression in ['sad', 'fear', 'angry', 'disgust']:
+            recommendations_list.append(
+                'Your recent facial expression indicates possible negative emotions. Take some time to relax and talk to someone you trust if needed.'
+            )
+
+    if heart_rate > 100:
+        recommendations_list.append(
+            'Your recent heart rate is elevated. Rest for a while and try slow, controlled breathing.'
+        )
+
+    if prediction == 'High Distress':
+        recommendations_list.append(
+            'Your current AI distress prediction is high. Consider taking a break, practicing relaxation, and talking to a trusted person or qualified mental-health professional if distress continues.'
+        )
+    elif prediction == 'Moderate Distress':
+        recommendations_list.append(
+            'Your current AI distress prediction is moderate. Focus on sleep, relaxation, breathing exercises, and regular self-monitoring.'
+        )
+    elif prediction == 'Low Distress':
+        recommendations_list.append(
+            'Your current AI distress prediction is low. Continue maintaining your healthy daily routine.'
+        )
+
+    if not recommendations_list:
+        recommendations_list.append(
+            'Continue monitoring your mood, sleep, stress, journal, facial expression, and heart rate regularly.'
+        )
 
     return render(
         request,
         'monitoring/dashboard.html',
-        context
+        {
+            'moods': moods,
+            'sleeps': sleeps,
+            'journals': journals,
+            'stresses': stresses,
+            'breathings': breathings,
+            'facial_expressions': facial_expressions,
+            'heart_rates': heart_rates,
+            'wellness_score': wellness_score,
+            'wellness_status': wellness_status,
+            'prediction': prediction,
+            'dashboard_distress_level': prediction,
+            'recommendations': recommendations_list,
+        },
     )
 
 
 def mood(request):
-    return render(
-        request,
-        'monitoring/mood.html'
-    )
+    return render(request, 'monitoring/mood.html')
 
 
 @login_required
@@ -235,32 +244,23 @@ def sleep(request):
         SleepEntry.objects.create(
             user=request.user,
             hours=hours,
-            quality=quality
+            quality=quality,
         )
 
         return redirect('sleep')
 
-    sleeps = SleepEntry.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
+    sleeps = SleepEntry.objects.filter(user=request.user).order_by('-created_at')
 
-    return render(
-        request,
-        'monitoring/sleep.html',
-        {
-            'sleeps': sleeps
-        }
-    )
+    return render(request, 'monitoring/sleep.html', {'sleeps': sleeps})
 
 
 @login_required
 def journal(request):
     if request.method == 'POST':
-        title = request.POST.get('title')
         content = request.POST.get('content')
 
-        result = TextBlob(content)
-        polarity = result.sentiment.polarity
+        analysis = TextBlob(content)
+        polarity = analysis.sentiment.polarity
 
         if polarity > 0:
             sentiment = 'Positive'
@@ -271,25 +271,15 @@ def journal(request):
 
         JournalEntry.objects.create(
             user=request.user,
-            title=title,
             content=content,
             sentiment=sentiment,
-            sentiment_score=polarity
         )
 
         return redirect('journal')
 
-    journals = JournalEntry.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
+    journals = JournalEntry.objects.filter(user=request.user).order_by('-created_at')
 
-    return render(
-        request,
-        'monitoring/journal.html',
-        {
-            'journals': journals
-        }
-    )
+    return render(request, 'monitoring/journal.html', {'journals': journals})
 
 
 @login_required
@@ -298,243 +288,192 @@ def stress(request):
         score = 0
 
         for i in range(1, 11):
-            answer = request.POST.get(f'q{i}')
+            answer = request.POST.get(f'q{i}', '0')
             score += int(answer)
 
         if score <= 10:
-            level = 'low'
+            level = 'Low'
         elif score <= 20:
-            level = 'moderate'
+            level = 'Moderate'
         else:
-            level = 'high'
+            level = 'High'
 
         StressEntry.objects.create(
             user=request.user,
             score=score,
-            level=level
+            level=level,
         )
 
         return render(
             request,
             'monitoring/stress_result.html',
-            {
-                'score': score,
-                'level': level
-            }
+            {'score': score, 'level': level},
         )
 
-    return render(
-        request,
-        'monitoring/stress.html'
-    )
+    return render(request, 'monitoring/stress.html')
 
 
 @login_required
 def breathing(request):
     if request.method == 'POST':
-        BreathingEntry.objects.create(
-            user=request.user,
-            duration=5
-        )
-
+        BreathingEntry.objects.create(user=request.user, duration=5)
         return redirect('breathing')
 
-    breathings = BreathingEntry.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
+    breathings = BreathingEntry.objects.filter(user=request.user).order_by('-created_at')
 
-    return render(
-        request,
-        'monitoring/breathing.html',
-        {
-            'breathings': breathings
-        }
-    )
+    return render(request, 'monitoring/breathing.html', {'breathings': breathings})
 
 
 def home(request):
-    return render(
-        request,
-        'home.html'
-    )
+    return render(request, 'home.html')
 
 
 @login_required
 def heart_rate(request):
-    if request.method == "POST":
-        heart_rate = request.POST.get("heart_rate")
+    if request.method == 'POST':
+        heart_rate_value = request.POST.get('heart_rate')
 
-        if heart_rate and heart_rate.isdigit():
-            heart_rate = int(heart_rate)
+        if heart_rate_value and heart_rate_value.isdigit():
+            heart_rate_value = int(heart_rate_value)
 
-            if 30 <= heart_rate <= 220:
+            if 30 <= heart_rate_value <= 220:
                 HeartRateEntry.objects.create(
                     user=request.user,
-                    heart_rate=heart_rate
+                    heart_rate=heart_rate_value,
                 )
 
-                return redirect("heart_rate")
+        return redirect('heart_rate')
 
-    heart_rates = HeartRateEntry.objects.filter(
-        user=request.user
-    ).order_by("-created_at")
+    heart_rates = HeartRateEntry.objects.filter(user=request.user).order_by('-created_at')
 
-    return render(
-        request,
-        "monitoring/heart_rate.html",
-        {
-            "heart_rates": heart_rates
-        }
-    )
+    return render(request, 'monitoring/heart_rate.html', {'heart_rates': heart_rates})
 
 
 @login_required
 def heart_rate_api(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            heart_rate = data.get("heart_rate")
+            heart_rate_value = data.get('heart_rate')
 
-            if heart_rate is not None:
-                heart_rate = int(heart_rate)
+            if heart_rate_value is not None:
+                heart_rate_value = int(heart_rate_value)
 
-                if 30 <= heart_rate <= 220:
+                if 30 <= heart_rate_value <= 220:
                     HeartRateEntry.objects.create(
                         user=request.user,
-                        heart_rate=heart_rate
+                        heart_rate=heart_rate_value,
                     )
 
                     return JsonResponse({
-                        "message": "Heart rate saved",
-                        "heart_rate": heart_rate
+                        'status': 'success',
+                        'heart_rate': heart_rate_value,
                     })
 
-        except (ValueError, TypeError, json.JSONDecodeError):
-            pass
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Heart rate must be between 30 and 220 BPM.',
+                }, status=400)
 
-        return JsonResponse({
-            "message": "Invalid heart rate"
-        }, status=400)
+        except (json.JSONDecodeError, ValueError, TypeError):
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Invalid heart rate data.',
+            }, status=400)
 
     return JsonResponse({
-        "message": "Only POST requests are allowed"
+        'status': 'error',
+        'message': 'Only POST requests are allowed.',
     }, status=405)
 
 
 @login_required
 def distress_prediction(request):
-    model_path = os.path.join(
-        settings.BASE_DIR,
-        'ai_model',
-        'distress_model.pkl'
-    )
+    latest_mood = MoodEntry.objects.filter(user=request.user).order_by('-created_at').first()
+    latest_sleep = SleepEntry.objects.filter(user=request.user).order_by('-created_at').first()
+    latest_stress = StressEntry.objects.filter(user=request.user).order_by('-created_at').first()
+    latest_journal = JournalEntry.objects.filter(user=request.user).order_by('-created_at').first()
+    latest_facial = FacialExpression.objects.filter(user=request.user).order_by('-created_at').first()
+    latest_heart_rate = HeartRateEntry.objects.filter(user=request.user).order_by('-created_at').first()
 
-    if not os.path.exists(model_path):
-        return render(
-            request,
-            'monitoring/distress_prediction.html',
-            {
-                'distress_level': 'Model not trained yet',
-                'mood': 3,
-                'sleep_hours': 7,
-                'sleep_quality': 3,
-                'stress_score': 10,
-                'journal_sentiment': 0,
-                'facial_expression': 3,
-                'heart_rate': 75
-            }
-        )
+    mood = 3
+    sleep_hours = 7
+    sleep_quality = 3
+    stress_score = 10
+    journal_sentiment = 0
+    facial_expression = 3
+    heart_rate = 75
 
-    model = joblib.load(model_path)
-
-    moods = MoodEntry.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
-
-    sleeps = SleepEntry.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
-
-    journals = JournalEntry.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
-
-    stresses = StressEntry.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
-
-    facial_expressions = FacialExpression.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
-
-    heart_rates = HeartRateEntry.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
-
-    if moods:
-        mood_values = {
-            'very_sad': 1,
-            'sad': 2,
-            'okay': 3,
-            'good': 4,
+    if latest_mood:
+        mood_map = {
             'excellent': 5,
+            'good': 4,
+            'okay': 3,
+            'sad': 2,
+            'very_sad': 1,
         }
+        mood = mood_map.get(latest_mood.mood, 3)
 
-        mood = mood_values.get(
-            moods[0].mood,
-            3
-        )
-    else:
-        mood = 3
+    if latest_sleep:
+        sleep_hours = float(latest_sleep.hours)
+        sleep_quality = int(latest_sleep.quality)
 
-    if sleeps:
-        sleep_hours = sleeps[0].hours
-        sleep_quality = sleeps[0].quality
-    else:
-        sleep_hours = 7
-        sleep_quality = 3
+    if latest_stress:
+        stress_score = latest_stress.score
 
-    if stresses:
-        stress_score = stresses[0].score
-    else:
-        stress_score = 10
+    if latest_journal:
+        journal_sentiment = TextBlob(latest_journal.content).sentiment.polarity
 
-    if journals:
-        journal_sentiment = journals[0].sentiment_score
+    if latest_facial:
+        expression_map = {
+            'happy': 5,
+            'surprise': 5,
+            'neutral': 3,
+            'sad': 1,
+            'fear': 1,
+            'angry': 1,
+            'disgust': 1,
+        }
+        facial_expression = expression_map.get(latest_facial.expression.lower(), 3)
 
-        if journal_sentiment is None:
-            journal_sentiment = 0
+    if latest_heart_rate:
+        heart_rate = latest_heart_rate.heart_rate
 
-        if journal_sentiment > 0:
-            journal_sentiment = 1
-        elif journal_sentiment < 0:
-            journal_sentiment = -1
-        else:
-            journal_sentiment = 0
-    else:
-        journal_sentiment = 0
+    model_path = os.path.join(settings.BASE_DIR, 'ai_model', 'distress_model.pkl')
 
-    if facial_expressions:
-        expression = facial_expressions[0].expression.lower()
+    prediction = 'Prediction unavailable'
 
-        if expression in ['happy', 'surprise']:
-            facial_expression = 5
-        elif expression == 'neutral':
-            facial_expression = 3
-        elif expression in ['sad', 'fear', 'angry', 'disgust']:
-            facial_expression = 1
-        else:
-            facial_expression = 3
-    else:
-        facial_expression = 3
+    if os.path.exists(model_path):
+        try:
+            model = joblib.load(model_path)
 
-    if heart_rates:
-        heart_rate = heart_rates[0].heart_rate
-    else:
-        heart_rate = 75
+            data = pd.DataFrame([{
+                'mood': mood,
+                'sleep_hours': sleep_hours,
+                'sleep_quality': sleep_quality,
+                'stress_score': stress_score,
+                'journal_sentiment': journal_sentiment,
+                'facial_expression': facial_expression,
+                'heart_rate': heart_rate,
+            }])
 
-    input_data = pd.DataFrame([
+            result = model.predict(data)[0]
+
+            if result == 0:
+                prediction = 'Low Distress'
+            elif result == 1:
+                prediction = 'Moderate Distress'
+            else:
+                prediction = 'High Distress'
+
+        except Exception:
+            prediction = 'Prediction unavailable'
+
+    return render(
+        request,
+        'monitoring/distress_prediction.html',
         {
+            'prediction': prediction,
             'mood': mood,
             'sleep_hours': sleep_hours,
             'sleep_quality': sleep_quality,
@@ -542,31 +481,180 @@ def distress_prediction(request):
             'journal_sentiment': journal_sentiment,
             'facial_expression': facial_expression,
             'heart_rate': heart_rate,
-        }
-    ])
+        },
+    )
 
-    prediction = model.predict(
-        input_data
-    )[0]
 
-    if prediction == 0:
-        distress_level = 'Low'
-    elif prediction == 1:
-        distress_level = 'Moderate'
-    else:
+@login_required
+def recommendations(request):
+    latest_mood = MoodEntry.objects.filter(user=request.user).order_by('-created_at').first()
+    latest_sleep = SleepEntry.objects.filter(user=request.user).order_by('-created_at').first()
+    latest_journal = JournalEntry.objects.filter(user=request.user).order_by('-created_at').first()
+    latest_stress = StressEntry.objects.filter(user=request.user).order_by('-created_at').first()
+    latest_facial = FacialExpression.objects.filter(user=request.user).order_by('-created_at').first()
+    latest_heart_rate = HeartRateEntry.objects.filter(user=request.user).order_by('-created_at').first()
+
+    recommendations_list = []
+
+    mood = 'okay'
+    sleep_hours = 7
+    stress_score = 10
+    journal_sentiment = 0
+    expression = 'neutral'
+    heart_rate = 75
+
+    if latest_mood:
+        mood = latest_mood.mood
+
+    if latest_sleep:
+        sleep_hours = float(latest_sleep.hours)
+
+    if latest_stress:
+        stress_score = latest_stress.score
+
+    if latest_journal:
+        journal_sentiment = TextBlob(latest_journal.content).sentiment.polarity
+
+    if latest_facial:
+        expression = latest_facial.expression.lower()
+
+    if latest_heart_rate:
+        heart_rate = latest_heart_rate.heart_rate
+
+    if mood in ['sad', 'very_sad']:
+        recommendations_list.append(
+            'Try a relaxing activity such as listening to music, taking a walk, or talking to someone you trust.'
+        )
+
+    if sleep_hours < 6:
+        recommendations_list.append(
+            'Your sleep duration is low. Try maintaining a regular sleep schedule and aim for 7 to 9 hours of sleep.'
+        )
+
+    if stress_score > 20:
+        recommendations_list.append(
+            'Your stress level is high. Try the breathing exercise and take short breaks during the day.'
+        )
+    elif stress_score > 10:
+        recommendations_list.append(
+            'Your stress level is moderate. Practice relaxation or breathing exercises regularly.'
+        )
+
+    if journal_sentiment < 0:
+        recommendations_list.append(
+            'Your recent journal entry appears negative. Continue writing your thoughts and consider talking to someone you trust.'
+        )
+
+    if expression in ['sad', 'fear', 'angry', 'disgust']:
+        recommendations_list.append(
+            'Your recent facial expression indicates possible negative emotions. Take some time to relax and talk to someone you trust if needed.'
+        )
+
+    if heart_rate > 100:
+        recommendations_list.append(
+            'Your recent heart rate is elevated. Rest for a while and try slow, controlled breathing.'
+        )
+
+    if (
+        sleep_hours >= 7
+        and stress_score <= 10
+        and mood in ['excellent', 'good']
+    ):
+        recommendations_list.append(
+            'Your recent wellness indicators look positive. Continue your healthy sleep, relaxation, and daily wellness routine.'
+        )
+
+    if not recommendations_list:
+        recommendations_list.append(
+            'Continue monitoring your mood, sleep, stress, journal, facial expression, and heart rate regularly.'
+        )
+
+    distress_level = 'Low'
+
+    if stress_score > 20 or mood == 'very_sad':
         distress_level = 'High'
+    elif stress_score > 10 or mood == 'sad':
+        distress_level = 'Moderate'
+
+    if heart_rate > 100:
+        distress_level = 'High'
+
+    for recommendation in recommendations_list:
+        Recommendation.objects.create(
+            user=request.user,
+            distress_level=distress_level,
+            recommendation=recommendation,
+        )
 
     return render(
         request,
-        'monitoring/distress_prediction.html',
+        'monitoring/recommendations.html',
         {
-            'distress_level': distress_level,
+            'recommendations': recommendations_list,
             'mood': mood,
             'sleep_hours': sleep_hours,
-            'sleep_quality': sleep_quality,
             'stress_score': stress_score,
             'journal_sentiment': journal_sentiment,
-            'facial_expression': facial_expression,
-            'heart_rate': heart_rate
-        }
+            'expression': expression,
+            'heart_rate': heart_rate,
+            'distress_level': distress_level,
+        },
+    )
+
+
+@login_required
+def recommendation_history(request):
+    recommendation_history = Recommendation.objects.filter(
+        user=request.user
+    ).order_by('-created_at')
+
+    return render(
+        request,
+        'monitoring/recommendation_history.html',
+        {'recommendation_history': recommendation_history},
+    )
+
+
+@login_required
+def delete_recommendation(request, id):
+    recommendation = Recommendation.objects.get(id=id, user=request.user)
+
+    if request.method == 'POST':
+        recommendation.delete()
+
+    return redirect('recommendation_history')
+
+
+@login_required
+def clear_recommendation_history(request):
+    if request.method == 'POST':
+        Recommendation.objects.filter(user=request.user).delete()
+
+    return redirect('recommendation_history')
+
+
+@login_required
+def facial_expression(request):
+    if request.method == 'POST':
+        expression = request.POST.get('expression')
+
+        if expression:
+            FacialExpression.objects.create(
+                user=request.user,
+                expression=expression,
+            )
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'success'})
+
+        return redirect('facial_expression')
+
+    facial_expressions = FacialExpression.objects.filter(
+        user=request.user
+    ).order_by('-created_at')
+
+    return render(
+        request,
+        'monitoring/facial_expression.html',
+        {'facial_expressions': facial_expressions},
     )

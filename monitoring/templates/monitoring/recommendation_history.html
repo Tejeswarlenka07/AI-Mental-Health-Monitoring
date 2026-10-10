@@ -1,0 +1,152 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+```
+<title>Recommendation History - MindCare AI</title>
+
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+```
+
+</head>
+
+<body>
+
+```
+<nav class="navbar">
+
+    <div>
+        <h2>MindCare AI</h2>
+    </div>
+
+    <div>
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+    </div>
+
+</nav>
+
+<main class="container">
+
+    <section class="ai-card ai-glow">
+
+        <div class="ai-badge">
+            AI RECOMMENDATION HISTORY
+        </div>
+
+        <h1>Recommendation History</h1>
+
+        <p>
+            Review your previous personalized wellness recommendations.
+        </p>
+
+    </section>
+
+    {% if recommendation_history %}
+
+        <div style="text-align: right; margin: 25px 0;">
+
+            <form
+                method="POST"
+                action="{% url 'clear_recommendation_history' %}"
+                onsubmit="return confirm('Are you sure you want to delete all recommendation history?');"
+            >
+
+                {% csrf_token %}
+
+                <button type="submit" class="button danger">
+                    Clear All History
+                </button>
+
+            </form>
+
+        </div>
+
+        {% for item in recommendation_history %}
+
+            <div class="history-card">
+
+                <div class="ai-badge">
+                    AI RECOMMENDATION
+                </div>
+
+                <h2>
+                    Distress Level: {{ item.distress_level }}
+                </h2>
+
+                <p>
+                    {{ item.recommendation }}
+                </p>
+
+                <div class="history-date">
+
+                    Date:
+                    {{ item.created_at|date:"d M Y" }}
+
+                    &nbsp; • &nbsp;
+
+                    Time:
+                    {{ item.created_at|date:"h:i A" }}
+
+                </div>
+
+                <form
+                    method="POST"
+                    action="{% url 'delete_recommendation' item.id %}"
+                    onsubmit="return confirm('Are you sure you want to delete this recommendation?');"
+                >
+
+                    {% csrf_token %}
+
+                    <button type="submit" class="button button-secondary">
+                        Delete
+                    </button>
+
+                </form>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="data-card">
+
+            <h2>No Recommendation History</h2>
+
+            <p>
+                No recommendation history is available yet.
+                Generate your first personalized recommendation to begin tracking your AI insights.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+    <div style="text-align: center; margin-top: 35px;">
+
+        <a href="{% url 'recommendations' %}" class="button">
+            Get New Recommendations
+        </a>
+
+        <a href="{% url 'dashboard' %}" class="button button-secondary">
+            Back to Dashboard
+        </a>
+
+    </div>
+
+</main>
+
+<footer class="footer">
+
+    <p>MindCare AI • Your personalized wellness journey.</p>
+
+</footer>
+```
+
+</body>
+
+</html>

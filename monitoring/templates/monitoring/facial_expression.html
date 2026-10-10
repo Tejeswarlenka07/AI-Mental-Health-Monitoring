@@ -1,0 +1,831 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+```
+<title>Facial Expression AI - MindCare AI</title>
+
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+<style>
+
+    .face-page {
+        max-width: 1200px;
+        margin: auto;
+        padding: 30px 20px 60px;
+    }
+
+    .face-header {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+
+    .face-header h1 {
+        font-size: 42px;
+        margin-bottom: 10px;
+    }
+
+    .face-header p {
+        color: #aeb8d0;
+        font-size: 16px;
+    }
+
+    .camera-card {
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+    }
+
+    .camera-container {
+        position: relative;
+        width: 100%;
+        max-width: 720px;
+        margin: 25px auto;
+        border-radius: 22px;
+        overflow: hidden;
+        background: #080c18;
+        border: 1px solid rgba(255,255,255,0.12);
+        box-shadow: 0 0 40px rgba(80,120,255,0.12);
+    }
+
+    #video {
+        display: block;
+        width: 100%;
+        height: auto;
+        min-height: 350px;
+        object-fit: cover;
+        transform: scaleX(-1);
+        background: #080c18;
+    }
+
+    #overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    .camera-status {
+        margin-top: 15px;
+        padding: 12px 18px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.05);
+        color: #b9c4dc;
+    }
+
+    .detection-card {
+        max-width: 720px;
+        margin: 30px auto 0;
+        padding: 28px;
+        text-align: center;
+        border-radius: 20px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .detection-label {
+        color: #9da9c5;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    #expression {
+        font-size: 42px;
+        font-weight: 700;
+        margin: 10px 0;
+        background: linear-gradient(90deg, #7c5cff, #00d4ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    #confidence {
+        color: #b9c4dc;
+        font-size: 16px;
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin: 25px 0;
+    }
+
+    .save-form {
+        margin-top: 20px;
+    }
+
+    .history-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 18px;
+        margin-top: 20px;
+    }
+
+    .expression-history-card {
+        padding: 22px;
+        border-radius: 18px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.09);
+        transition: 0.3s;
+    }
+
+    .expression-history-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(124,92,255,0.5);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .history-expression {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .history-date {
+        color: #8995b2;
+        font-size: 13px;
+    }
+
+    .ai-info {
+        margin-top: 30px;
+        padding: 22px;
+        border-radius: 18px;
+        background: linear-gradient(
+            135deg,
+            rgba(124,92,255,0.10),
+            rgba(0,212,255,0.06)
+        );
+        border: 1px solid rgba(124,92,255,0.18);
+    }
+
+    .ai-info h3 {
+        margin-top: 0;
+    }
+
+    .loading {
+        color: #aeb8d0;
+    }
+
+    .error {
+        color: #ff7b8a;
+    }
+
+    @media (max-width: 700px) {
+
+        .face-header h1 {
+            font-size: 30px;
+        }
+
+        #video {
+            min-height: 250px;
+        }
+
+        #expression {
+            font-size: 32px;
+        }
+
+    }
+
+</style>
+```
+
+</head>
+
+<body>
+
+<nav class="navbar">
+
+```
+<div class="logo">
+    MindCare AI
+</div>
+
+<a href="{% url 'dashboard' %}" class="button button-secondary">
+    Dashboard
+</a>
+```
+
+</nav>
+
+<main class="face-page">
+
+```
+<div class="face-header">
+
+    <div class="ai-badge">
+        AI VISION
+    </div>
+
+    <h1>Facial Expression Analysis</h1>
+
+    <p>
+        AI-powered facial expression monitoring for your MindCare profile.
+    </p>
+
+</div>
+
+
+<section class="card camera-card">
+
+
+    <h2>Live AI Detection</h2>
+
+    <p>
+        Position your face inside the camera frame.
+    </p>
+
+
+    <div class="camera-container">
+
+        <video
+            id="video"
+            autoplay
+            muted
+            playsinline>
+        </video>
+
+        <canvas id="overlay"></canvas>
+
+    </div>
+
+
+    <div id="status" class="camera-status">
+
+        Loading AI facial-expression model...
+
+    </div>
+
+
+    <div class="button-group">
+
+        <button
+            type="button"
+            class="button"
+            onclick="startCamera()">
+
+            Start Camera
+
+        </button>
+
+
+        <button
+            type="button"
+            class="button button-secondary"
+            onclick="stopCamera()">
+
+            Stop Camera
+
+        </button>
+
+    </div>
+
+
+    <div class="detection-card">
+
+        <div class="detection-label">
+            Current Expression
+        </div>
+
+
+        <div id="expression">
+            Waiting...
+        </div>
+
+
+        <div id="confidence">
+            Confidence: --
+        </div>
+
+
+        <form
+            method="POST"
+            id="expressionForm"
+            class="save-form">
+
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="expression"
+                id="expressionInput">
+
+            <button
+                type="submit"
+                class="button">
+
+                Save Current Expression
+
+            </button>
+
+        </form>
+
+    </div>
+
+
+</section>
+
+
+<section class="ai-info">
+
+    <h3>How AI Detection Works</h3>
+
+    <p>
+        MindCare AI analyzes facial features from the camera and estimates
+        the most likely facial expression in real time.
+    </p>
+
+    <p>
+        The detected expression can be saved to your MindCare history
+        for future monitoring.
+    </p>
+
+</section>
+
+
+<section style="margin-top:45px;">
+
+
+    <div class="section-title">
+
+        <h2>Expression History</h2>
+
+        <p>
+            Your previously recorded facial expressions.
+        </p>
+
+    </div>
+
+
+    <div class="history-grid">
+
+
+        {% for expression in facial_expressions %}
+
+
+            <div class="expression-history-card">
+
+
+                <div class="history-expression">
+
+                    {{ expression.expression }}
+
+                </div>
+
+
+                <div class="history-date">
+
+                    {{ expression.created_at|date:"d M Y, h:i A" }}
+
+                </div>
+
+
+            </div>
+
+
+        {% empty %}
+
+
+            <div class="data-card">
+
+                <h3>No expression records yet.</h3>
+
+                <p>
+                    Start the camera and save your first detected expression.
+                </p>
+
+            </div>
+
+
+        {% endfor %}
+
+
+    </div>
+
+
+</section>
+```
+
+</main>
+
+<script>
+
+const video = document.getElementById("video");
+const overlay = document.getElementById("overlay");
+const expressionText = document.getElementById("expression");
+const confidenceText = document.getElementById("confidence");
+const statusText = document.getElementById("status");
+const expressionInput = document.getElementById("expressionInput");
+
+let stream = null;
+let detectionRunning = false;
+let lastExpression = "";
+let lastSavedExpression = "";
+let lastSaveTime = 0;
+
+
+const MODEL_URL =
+    "https://justadudewhohacks.github.io/face-api.js/models";
+
+
+async function loadAIModel() {
+
+    try {
+
+        statusText.innerText =
+            "Loading AI facial-expression model...";
+
+        await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+
+        await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL);
+
+        statusText.innerText =
+            "AI model loaded. Start the camera.";
+
+    }
+
+    catch (error) {
+
+        statusText.innerText =
+            "AI model could not be loaded.";
+
+        statusText.className =
+            "camera-status error";
+
+        console.log(error);
+
+    }
+
+}
+
+
+async function startCamera() {
+
+    if (detectionRunning) {
+
+        return;
+
+    }
+
+
+    try {
+
+        stream = await navigator.mediaDevices.getUserMedia({
+
+            video: {
+                width: 640,
+                height: 480
+            },
+
+            audio: false
+
+        });
+
+
+        video.srcObject = stream;
+
+        detectionRunning = true;
+
+        statusText.className =
+            "camera-status";
+
+        statusText.innerText =
+            "Camera started. Looking for a face...";
+
+        detectExpression();
+
+    }
+
+    catch (error) {
+
+        statusText.className =
+            "camera-status error";
+
+        statusText.innerText =
+            "Camera could not be started. Please allow camera access.";
+
+        console.log(error);
+
+    }
+
+}
+
+
+function stopCamera() {
+
+    detectionRunning = false;
+
+
+    if (stream) {
+
+        stream.getTracks().forEach(function(track) {
+
+            track.stop();
+
+        });
+
+        stream = null;
+
+    }
+
+
+    video.srcObject = null;
+
+
+    expressionText.innerText =
+        "Stopped";
+
+    confidenceText.innerText =
+        "Confidence: --";
+
+    statusText.className =
+        "camera-status";
+
+    statusText.innerText =
+        "Camera stopped.";
+
+}
+
+
+async function detectExpression() {
+
+    if (!detectionRunning) {
+
+        return;
+
+    }
+
+
+    if (video.readyState < 2) {
+
+        requestAnimationFrame(detectExpression);
+
+        return;
+
+    }
+
+
+    const detections =
+        await faceapi
+        .detectAllFaces(
+            video,
+            new faceapi.TinyFaceDetectorOptions()
+        )
+        .withFaceExpressions();
+
+
+    const displaySize = {
+
+        width: video.videoWidth,
+
+        height: video.videoHeight
+
+    };
+
+
+    if (displaySize.width > 0 && displaySize.height > 0) {
+
+        overlay.width =
+            displaySize.width;
+
+        overlay.height =
+            displaySize.height;
+
+    }
+
+
+    const context =
+        overlay.getContext("2d");
+
+    context.clearRect(
+        0,
+        0,
+        overlay.width,
+        overlay.height
+    );
+
+
+    if (detections.length === 0) {
+
+        expressionText.innerText =
+            "No Face";
+
+        confidenceText.innerText =
+            "Confidence: --";
+
+        statusText.innerText =
+            "No face detected. Please look at the camera.";
+
+    }
+
+    else {
+
+        const result =
+            detections[0];
+
+        const expressions =
+            result.expressions;
+
+
+        let highestExpression =
+            "neutral";
+
+        let highestValue =
+            expressions.neutral;
+
+
+        Object.keys(expressions).forEach(function(name) {
+
+            if (expressions[name] > highestValue) {
+
+                highestExpression =
+                    name;
+
+                highestValue =
+                    expressions[name];
+
+            }
+
+        });
+
+
+        const expressionName =
+            highestExpression.charAt(0).toUpperCase()
+            + highestExpression.slice(1);
+
+
+        const confidence =
+            Math.round(highestValue * 100);
+
+
+        expressionText.innerText =
+            expressionName;
+
+
+        confidenceText.innerText =
+            "Confidence: " + confidence + "%";
+
+
+        expressionInput.value =
+            expressionName;
+
+
+        statusText.innerText =
+            "Face detected and analyzed by AI.";
+
+
+        const resizedDetections =
+            faceapi.resizeResults(
+                detections,
+                displaySize
+            );
+
+
+        resizedDetections.forEach(function(detection) {
+
+            const box =
+                detection.detection.box;
+
+
+            context.strokeStyle =
+                "#00d4ff";
+
+            context.lineWidth =
+                3;
+
+
+            context.strokeRect(
+                box.x,
+                box.y,
+                box.width,
+                box.height
+            );
+
+        });
+
+
+        saveDetectedExpression(
+            expressionName,
+            confidence
+        );
+
+    }
+
+
+    setTimeout(function() {
+
+        detectExpression();
+
+    }, 500);
+
+}
+
+
+async function saveDetectedExpression(
+    expression,
+    confidence
+) {
+
+    const currentTime =
+        Date.now();
+
+
+    if (
+        expression === lastSavedExpression &&
+        currentTime - lastSaveTime < 10000
+    ) {
+
+        return;
+
+    }
+
+
+    if (confidence < 50) {
+
+        return;
+
+    }
+
+
+    lastSavedExpression =
+        expression;
+
+    lastSaveTime =
+        currentTime;
+
+
+    const csrfToken =
+        document.querySelector(
+            "[name=csrfmiddlewaretoken]"
+        ).value;
+
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "expression",
+        expression
+    );
+
+
+    formData.append(
+        "csrfmiddlewaretoken",
+        csrfToken
+    );
+
+
+    try {
+
+        await fetch(
+            "{% url 'facial_expression' %}",
+            {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "Expression save error:",
+            error
+        );
+
+    }
+
+}
+
+
+window.addEventListener(
+    "beforeunload",
+    function() {
+
+        stopCamera();
+
+    }
+);
+
+
+loadAIModel();
+
+</script>
+
+</body>
+
+</html>

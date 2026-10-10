@@ -1,174 +1,346 @@
+{% load static %}
+
 <!DOCTYPE html>
 
 <html>
 <head>
     <title>Dashboard - MindCare AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
+
+<div class="navbar">
+    <h2>MindCare AI</h2>
+    <div>
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+        <a href="{% url 'profile' %}">Profile</a>
+    </div>
+</div>
+
+<div class="container">
+
+```
 <h1>Welcome, {{ request.user.username }}</h1>
 
-<h2>MindCare AI Dashboard</h2>
+<p class="page-subtitle">
+    Your personal AI-powered mental wellness dashboard
+</p>
 
-<div class="card">
+<div class="grid">
 
-    <h2>Wellness Score</h2>
+    <div class="card wellness-card ai-glow">
+        <span class="ai-badge">WELLNESS ANALYSIS</span>
+        <h2>Your Wellness Score</h2>
 
-    <h1>{{ wellness_score }}/100</h1>
+        <div class="wellness-score">
+            <span>{{ wellness_score }}</span>
+        </div>
 
-    <p>{{ wellness_status }}</p>
+        <p class="status">{{ wellness_status }}</p>
+    </div>
 
-</div>
+    <div class="card ai-card ai-glow">
+        <span class="ai-badge">AI ANALYSIS</span>
+        <h2>AI Distress Prediction</h2>
 
-<div class="card">
+        <div class="distress-level">
+            {{ dashboard_distress_level }}
+        </div>
 
-    <h2>AI Distress Prediction</h2>
+        <p>
+            AI estimated distress level based on your available wellness data.
+        </p>
 
-    <h1>{{ dashboard_distress_level }}</h1>
+        <br>
 
-    <p>AI estimated distress level based on your available wellness data.</p>
+        <a class="button" href="{% url 'distress_prediction' %}">
+            View AI Analysis
+        </a>
+    </div>
 
-    <a href="{% url 'distress_prediction' %}">
-        View Details
-    </a>
+    <div class="card ai-card ai-glow">
+        <span class="ai-badge">AI RECOMMENDATIONS</span>
+        <h2>Personalized Recommendations</h2>
 
-</div>
+        {% if recommendations %}
+            {% for recommendation in recommendations %}
+                <div class="recommendation-card">
+                    <p>{{ recommendation }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No recommendations available yet.</p>
+        {% endif %}
 
-<h2>Wellness Chart</h2>
+        <br>
 
-<canvas id="wellnessChart"></canvas>
+        <a class="button" href="{% url 'recommendations' %}">
+            Get Recommendations
+        </a>
 
-<h2>Sleep Chart</h2>
-
-<canvas id="sleepChart"></canvas>
-
-<h2>Stress Chart</h2>
-
-<canvas id="stressChart"></canvas>
-
-<h2>Mood Chart</h2>
-
-<canvas id="moodChart"></canvas>
-
-<h2>Latest Data</h2>
-
-<div class="card">
-
-    <h3>Mood</h3>
-
-    {% if moods %}
-        <p>{{ moods.0.mood }}</p>
-    {% else %}
-        <p>No mood recorded yet.</p>
-    {% endif %}
-
-    <a href="{% url 'mood' %}">Add Mood</a>
-
-</div>
-
-<div class="card">
-
-    <h3>Sleep</h3>
-
-    {% if sleeps %}
-        <p>{{ sleeps.0.hours }} hours</p>
-        <p>Quality: {{ sleeps.0.quality }}</p>
-    {% else %}
-        <p>No sleep recorded yet.</p>
-    {% endif %}
-
-    <a href="{% url 'sleep' %}">Add Sleep</a>
-
-</div>
-
-<div class="card">
-
-    <h3>Journal</h3>
-
-    {% if journals %}
-        <p>{{ journals.0.sentiment }}</p>
-    {% else %}
-        <p>No journal entry yet.</p>
-    {% endif %}
-
-    <a href="{% url 'journal' %}">Open Journal</a>
-
-</div>
-
-<div class="card">
-
-    <h3>Stress</h3>
-
-    {% if stresses %}
-        <p>Score: {{ stresses.0.score }}</p>
-        <p>Level: {{ stresses.0.level }}</p>
-    {% else %}
-        <p>No stress assessment yet.</p>
-    {% endif %}
-
-    <a href="{% url 'stress' %}">Take Assessment</a>
-
-</div>
-
-<div class="card">
-
-    <h3>Breathing Exercise</h3>
-
-    {% if breathings %}
-        <p>Completed sessions: {{ breathings|length }}</p>
-    {% else %}
-        <p>No breathing exercise completed yet.</p>
-    {% endif %}
-
-    <a href="{% url 'breathing' %}">Start Exercise</a>
-
-</div>
-
-<div class="card">
-
-    <h3>Facial Expression</h3>
-
-    {% if facial_expressions %}
-        <p>{{ facial_expressions.0.expression }}</p>
-    {% else %}
-        <p>No facial expression recorded yet.</p>
-    {% endif %}
-
-</div>
-
-<div class="card">
-
-    <h3>Heart Rate</h3>
-
-    {% if heart_rates %}
-        <h2>{{ heart_rates.0.heart_rate }} BPM</h2>
-        <p>Latest reading</p>
-    {% else %}
-        <p>No heart rate recorded yet.</p>
-    {% endif %}
-
-    <a href="{% url 'heart_rate' %}">
-        Add Heart Rate
-    </a>
+        <a class="button button-secondary" href="{% url 'recommendation_history' %}">
+            View History
+        </a>
+    </div>
 
 </div>
 
 <br>
 
-<a href="{% url 'profile' %}">Profile</a>
+<h2 class="page-title">Wellness Analytics</h2>
+
+<p class="page-subtitle">
+    Track your mental wellness patterns over time.
+</p>
+
+<div class="grid">
+
+    <div class="card chart-card">
+        <h3>Wellness Score</h3>
+        <canvas id="wellnessChart"></canvas>
+    </div>
+
+    <div class="card chart-card">
+        <h3>Sleep Analysis</h3>
+        <canvas id="sleepChart"></canvas>
+    </div>
+
+    <div class="card chart-card">
+        <h3>Stress Analysis</h3>
+        <canvas id="stressChart"></canvas>
+    </div>
+
+    <div class="card chart-card">
+        <h3>Mood Analysis</h3>
+        <canvas id="moodChart"></canvas>
+    </div>
+
+</div>
+
+<br>
+
+<h2 class="page-title">Latest Wellness Data</h2>
+
+<p class="page-subtitle">
+    Your most recent health and wellness information.
+</p>
+
+<div class="grid">
+
+    <div class="card data-card">
+        <div>
+            <div class="data-label">Current Mood</div>
+
+            {% if moods %}
+                <div class="data-value">{{ moods.0.mood }}</div>
+            {% else %}
+                <div class="data-value">--</div>
+                <p>No mood recorded yet.</p>
+            {% endif %}
+        </div>
+
+        <a class="button" href="{% url 'mood' %}">Add Mood</a>
+    </div>
+
+    <div class="card data-card">
+        <div>
+            <div class="data-label">Sleep</div>
+
+            {% if sleeps %}
+                <div class="data-value">{{ sleeps.0.hours }} hrs</div>
+                <p>Quality: {{ sleeps.0.quality }}</p>
+            {% else %}
+                <div class="data-value">--</div>
+                <p>No sleep recorded yet.</p>
+            {% endif %}
+        </div>
+
+        <a class="button" href="{% url 'sleep' %}">Add Sleep</a>
+    </div>
+
+    <div class="card data-card">
+        <div>
+            <div class="data-label">Journal</div>
+
+            {% if journals %}
+                <div class="data-value">{{ journals.0.sentiment }}</div>
+            {% else %}
+                <div class="data-value">--</div>
+                <p>No journal entry yet.</p>
+            {% endif %}
+        </div>
+
+        <a class="button" href="{% url 'journal' %}">Open Journal</a>
+    </div>
+
+    <div class="card data-card">
+        <div>
+            <div class="data-label">Stress</div>
+
+            {% if stresses %}
+                <div class="data-value">{{ stresses.0.score }}</div>
+                <p>Level: {{ stresses.0.level }}</p>
+            {% else %}
+                <div class="data-value">--</div>
+                <p>No stress assessment yet.</p>
+            {% endif %}
+        </div>
+
+        <a class="button" href="{% url 'stress' %}">Take Assessment</a>
+    </div>
+
+    <div class="card data-card">
+        <div>
+            <div class="data-label">Breathing Sessions</div>
+
+            {% if breathings %}
+                <div class="data-value">{{ breathings|length }}</div>
+                <p>Completed sessions</p>
+            {% else %}
+                <div class="data-value">0</div>
+                <p>No breathing exercise completed yet.</p>
+            {% endif %}
+        </div>
+
+        <a class="button" href="{% url 'breathing' %}">
+            Start Exercise
+        </a>
+    </div>
+
+    <div class="card data-card">
+        <div>
+            <div class="ai-badge">AI VISION</div>
+            <h2>Facial Expression</h2>
+
+            {% if latest_facial_expression %}
+                <div class="data-value">
+                    {{ latest_facial_expression.expression }}
+                </div>
+
+                <div class="data-label">
+                    Latest detected expression
+                </div>
+
+                <p class="history-date">
+                    {{ latest_facial_expression.created_at|date:"d M Y, h:i A" }}
+                </p>
+            {% else %}
+                <div class="data-value">--</div>
+
+                <div class="data-label">
+                    No expression detected yet
+                </div>
+            {% endif %}
+
+            <br>
+
+            <h3>Expression Records</h3>
+
+            <div class="data-value">
+                {{ facial_expressions|length }}
+            </div>
+
+            <div class="data-label">
+                Total AI expression records
+            </div>
+        </div>
+
+        <br>
+
+        <a href="{% url 'facial_expression' %}" class="button">
+            Open AI Vision
+        </a>
+    </div>
+
+    <div class="card data-card">
+        <div>
+            <div class="data-label">Heart Rate</div>
+
+            {% if heart_rates %}
+                <div class="data-value">
+                    {{ heart_rates.0.heart_rate }} BPM
+                </div>
+                <p>Latest reading</p>
+            {% else %}
+                <div class="data-value">--</div>
+                <p>No heart rate recorded yet.</p>
+            {% endif %}
+        </div>
+
+        <a class="button" href="{% url 'heart_rate' %}">
+            Add Heart Rate
+        </a>
+    </div>
+
+</div>
+
+<br><br>
+
+<div class="card ai-card ai-glow">
+    <span class="ai-badge">MINDCARE AI</span>
+
+    <h2>Your Mental Wellness Journey</h2>
+
+    <p>
+        Keep recording your mood, sleep, journal entries, stress,
+        breathing sessions, facial expressions and heart rate.
+        MindCare AI uses your available wellness data to provide
+        personalized insights and recommendations.
+    </p>
+
+    <br>
+
+    <a class="button" href="{% url 'recommendations' %}">
+        Explore AI Recommendations
+    </a>
+
+    <a class="button button-secondary" href="{% url 'recommendation_history' %}">
+        Recommendation History
+    </a>
+</div>
+```
+
+</div>
+
+<div class="footer">
+    <p>MindCare AI • AI-Powered Mental Wellness Monitoring</p>
+</div>
 
 <script>
+    const chartTextColor = '#94a3b8';
+    const chartGridColor = 'rgba(148, 163, 184, 0.08)';
 
     const wellnessChart = document.getElementById('wellnessChart');
 
     new Chart(wellnessChart, {
-        type: 'line',
+        type: 'doughnut',
         data: {
-            labels: ['Wellness'],
+            labels: ['Wellness', 'Remaining'],
             datasets: [{
-                label: 'Wellness Score',
-                data: [{{ wellness_score }}]
+                data: [
+                    {{ wellness_score }},
+                    100 - {{ wellness_score }}
+                ],
+                backgroundColor: [
+                    '#8b5cf6',
+                    'rgba(255, 255, 255, 0.06)'
+                ],
+                borderWidth: 0
             }]
+        },
+        options: {
+            responsive: true,
+            cutout: '75%',
+            plugins: {
+                legend: {
+                    labels: {
+                        color: chartTextColor
+                    }
+                }
+            }
         }
     });
 
@@ -188,8 +360,38 @@
                     {% for sleep in sleeps %}
                         {{ sleep.hours }},
                     {% endfor %}
-                ]
+                ],
+                backgroundColor: '#06b6d4',
+                borderRadius: 8
             }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    ticks: {
+                        color: chartTextColor
+                    },
+                    grid: {
+                        color: chartGridColor
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: chartTextColor
+                    },
+                    grid: {
+                        color: chartGridColor
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: chartTextColor
+                    }
+                }
+            }
         }
     });
 
@@ -209,8 +411,41 @@
                     {% for stress in stresses %}
                         {{ stress.score }},
                     {% endfor %}
-                ]
+                ],
+                borderColor: '#a78bfa',
+                backgroundColor: 'rgba(167, 139, 250, 0.12)',
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#a78bfa'
             }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    ticks: {
+                        color: chartTextColor
+                    },
+                    grid: {
+                        color: chartGridColor
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: chartTextColor
+                    },
+                    grid: {
+                        color: chartGridColor
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: chartTextColor
+                    }
+                }
+            }
         }
     });
 
@@ -240,9 +475,47 @@
                             5,
                         {% endif %}
                     {% endfor %}
-                ]
+                ],
+                borderColor: '#22d3ee',
+                backgroundColor: 'rgba(34, 211, 238, 0.12)',
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#22d3ee'
             }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    ticks: {
+                        color: chartTextColor
+                    },
+                    grid: {
+                        color: chartGridColor
+                    }
+                },
+                y: {
+                    min: 1,
+                    max: 5,
+                    ticks: {
+                        color: chartTextColor,
+                        stepSize: 1
+                    },
+                    grid: {
+                        color: chartGridColor
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: chartTextColor
+                    }
+                }
+            }
         }
     });
-
 </script>
+
+</body>
+</html>

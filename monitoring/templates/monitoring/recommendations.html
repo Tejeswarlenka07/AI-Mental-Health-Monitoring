@@ -1,0 +1,119 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+```
+<title>AI Recommendations - MindCare AI</title>
+
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+```
+
+</head>
+
+<body>
+
+```
+<nav class="navbar">
+
+    <div>
+        <h2>MindCare AI</h2>
+    </div>
+
+    <div>
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+    </div>
+
+</nav>
+
+<main class="container">
+
+    <section class="ai-card ai-glow">
+
+        <div class="ai-badge">
+            AI WELLNESS ASSISTANT
+        </div>
+
+        <h1>AI Recommendations</h1>
+
+        <p>
+            Personalized wellness suggestions based on your
+            MindCare AI data.
+        </p>
+
+    </section>
+
+    <section>
+
+        <div class="section-title">
+
+            <h2>Your Personalized Recommendations</h2>
+
+            <p>
+                Follow these suggestions to support your daily wellness.
+            </p>
+
+        </div>
+
+        <div class="grid">
+
+            {% for recommendation in recommendations %}
+
+                <div class="recommendation-card">
+
+                    <div class="ai-badge">
+                        AI INSIGHT
+                    </div>
+
+                    <h3>
+                        Recommendation {{ forloop.counter }}
+                    </h3>
+
+                    <p>
+                        {{ recommendation }}
+                    </p>
+
+                </div>
+
+            {% empty %}
+
+                <div class="data-card">
+
+                    <h3>No recommendations available.</h3>
+
+                    <p>
+                        Continue recording your wellness data to receive
+                        personalized AI recommendations.
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+    <div style="text-align: center; margin-top: 30px;">
+
+        <a href="{% url 'dashboard' %}" class="button button-secondary">
+            Back to Dashboard
+        </a>
+
+    </div>
+
+</main>
+
+<footer class="footer">
+
+    <p>MindCare AI • Personalized guidance for better wellness.</p>
+
+</footer>
+```
+
+</body>
+
+</html>
