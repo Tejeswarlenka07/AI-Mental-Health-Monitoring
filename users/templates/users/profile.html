@@ -1,64 +1,128 @@
+```html
+{% load static %}
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>My Profile - MindCare AI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | MindCare AI</title>
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
 </head>
-
 <body>
 
-    <h1>My Profile</h1>
+<div class="profile-layout">
+    <aside class="sidebar">
+        <div class="brand">
+            <span class="brand-icon">✦</span>
+            <span>MindCare <strong>AI</strong></span>
+        </div>
 
-    <p>
-        Username:
-        {{ request.user.username }}
-    </p>
+        <p class="nav-label">MENU</p>
 
-    <p>
-        Email:
-        {{ request.user.email }}
-    </p>
+        <a href="{% url 'dashboard' %}" class="nav-link">
+            <span>⌂</span> Dashboard
+        </a>
+        <a href="{% url 'profile' %}" class="nav-link active">
+            <span>◉</span> My Profile
+        </a>
 
-    <form method="POST">
+        <div class="sidebar-bottom">
+            <div class="sidebar-note">
+                <span>🌿</span>
+                <p>Take care of your mind. Your wellbeing matters.</p>
+            </div>
+            <a href="{% url 'logout' %}" class="nav-link logout">
+                <span>↪</span> Logout
+            </a>
+        </div>
+    </aside>
 
-        {% csrf_token %}
+    <main class="main-content">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">ACCOUNT SETTINGS</p>
+                <h1>My Profile</h1>
+                <p class="subtitle">Manage your personal information and preferences.</p>
+            </div>
+            <div class="topbar-badge">✦ Your wellness space</div>
+        </header>
 
-        <label>Age</label>
-        <br>
+        <section class="welcome-card">
+            <div class="avatar">
+                {{ request.user.username|first|upper }}
+            </div>
+            <div class="welcome-info">
+                <p class="eyebrow">YOUR ACCOUNT</p>
+                <h2>{{ request.user.username }}</h2>
+                <p>{{ request.user.email|default:"No email added" }}</p>
+            </div>
+            <span class="account-badge">● Active account</span>
+        </section>
 
-        <input
-            type="number"
-            name="age"
-            value="{{ profile.age|default:'' }}"
-        >
+        <section class="profile-card">
+            <div class="section-heading">
+                <div>
+                    <h2>Personal information</h2>
+                    <p>Keep your profile details up to date.</p>
+                </div>
+                <span class="section-icon">♧</span>
+            </div>
 
-        <br><br>
+            <div class="account-details">
+                <div class="detail-item">
+                    <span>Username</span>
+                    <strong>{{ request.user.username }}</strong>
+                </div>
+                <div class="detail-item">
+                    <span>Email address</span>
+                    <strong>{{ request.user.email|default:"Not provided" }}</strong>
+                </div>
+            </div>
 
-        <label>Bio</label>
-        <br>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="message">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
 
-        <textarea name="bio">{{ profile.bio }}</textarea>
+            <form method="POST" class="profile-form">
+                {% csrf_token %}
 
-        <br><br>
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input
+                        type="number"
+                        id="age"
+                        name="age"
+                        min="1"
+                        max="120"
+                        value="{{ profile.age|default_if_none:'' }}"
+                        placeholder="Enter your age"
+                    >
+                </div>
 
-        <button type="submit">
-            Save Profile
-        </button>
+                <div class="form-group">
+                    <label for="bio">About you</label>
+                    <textarea
+                        id="bio"
+                        name="bio"
+                        rows="4"
+                        maxlength="500"
+                        placeholder="Write a little about yourself..."
+                    >{{ profile.bio|default_if_none:'' }}</textarea>
+                    <small>Share only information you're comfortable providing.</small>
+                </div>
 
-    </form>
+                <button type="submit" class="save-button">
+                    Save changes <span>→</span>
+                </button>
+            </form>
+        </section>
 
-    <br>
-
-    <a href="{% url 'dashboard' %}">
-        Dashboard
-    </a>
-
-    <br><br>
-
-    <a href="{% url 'logout' %}">
-        Logout
-    </a>
+        <p class="footer-note">MindCare AI · Your mental wellbeing matters.</p>
+    </main>
+</div>
 
 </body>
-
 </html>
+```

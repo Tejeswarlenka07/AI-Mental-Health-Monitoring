@@ -1,84 +1,207 @@
-<h1>My Journal</h1>
 
-<p>Write about your thoughts and feelings.</p>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Journal | MindCare AI</title>
+    <link rel="stylesheet" href="{% static 'css/journal.css' %}">
+</head>
+<body>
 
-<form method="POST">
+<div class="app-layout">
 
-    {% csrf_token %}
+    <aside class="sidebar">
+        <a href="{% url 'dashboard' %}" class="brand">
+            <span class="brand-icon">✦</span>
+            <span>MindCare <small>AI WELLNESS</small></span>
+        </a>
 
-    <label>Title</label>
+        <p class="nav-heading">YOUR WELLNESS</p>
 
-    <br>
+        <nav class="navigation">
+            <a href="{% url 'dashboard' %}" class="nav-link">
+                <span>⌂</span> Dashboard
+            </a>
+            <a href="{% url 'mood' %}" class="nav-link">
+                <span>☻</span> Mood Tracking
+            </a>
+            <a href="{% url 'sleep' %}" class="nav-link">
+                <span>☾</span> Sleep Tracking
+            </a>
+            <a href="{% url 'journal' %}" class="nav-link active">
+                <span>▤</span> My Journal
+            </a>
+            <a href="{% url 'stress' %}" class="nav-link">
+                <span>♡</span> Stress Tracking
+            </a>
+            <a href="{% url 'breathing' %}" class="nav-link">
+                <span>◎</span> Breathing
+            </a>
+            <a href="{% url 'heart_rate' %}" class="nav-link">
+                <span>♡</span> Heart Rate
+            </a>
+            <a href="{% url 'distress_prediction' %}" class="nav-link">
+                <span>✧</span> AI Insights
+            </a>
+        </nav>
 
-    <input
-        type="text"
-        name="title"
-        placeholder="Enter journal title"
-        required
-    >
+        <div class="sidebar-note">
+            <div class="note-icon">🌱</div>
+            <h3>A little reminder</h3>
+            <p>Your feelings matter. Take a moment for yourself today.</p>
+        </div>
 
-    <br><br>
+        <a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
+    </aside>
 
-    <label>What's on your mind?</label>
+    <main class="main-content">
 
-    <br>
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">YOUR PERSONAL SPACE</p>
+                <h1>My Journal <span>✎</span></h1>
+            </div>
+            <div class="date-chip">✦ &nbsp; A moment for you</div>
+        </header>
 
-    <textarea
-        name="content"
-        rows="8"
-        cols="50"
-        placeholder="Write your thoughts here..."
-        required
-    ></textarea>
+        <section class="welcome-banner">
+            <div class="welcome-text">
+                <span class="banner-label">PAUSE · REFLECT · GROW</span>
+                <h2>Give your thoughts a place to breathe.</h2>
+                <p>Write freely, explore your feelings, and make time to understand yourself. This is your space, without judgment.</p>
+            </div>
+            <div class="banner-decoration" aria-hidden="true">
+                <div class="sun-circle">☀</div>
+                <span class="decor-leaf leaf-one">❧</span>
+                <span class="decor-leaf leaf-two">❧</span>
+                <span class="decor-star">✦</span>
+            </div>
+        </section>
 
-    <br><br>
+        <div class="content-grid">
 
-    <button type="submit">
-        Save Journal
-    </button>
+            <section class="journal-card">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">DAILY REFLECTION</p>
+                        <h2>What's on your mind?</h2>
+                    </div>
+                    <span class="heading-icon">✎</span>
+                </div>
 
-</form>
+                <p class="form-intro">There is no right or wrong way to journal. Start wherever you are.</p>
 
-<hr>
+                <form method="POST" class="journal-form">
+                    {% csrf_token %}
 
-<h2>Previous Journal Entries</h2>
+                    <label for="title">Entry title</label>
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        placeholder="Give today's thoughts a title..."
+                        maxlength="200"
+                        required
+                    >
 
-{% for entry in journals %}
+                    <div class="textarea-heading">
+                        <label for="content">Your thoughts and feelings</label>
+                        <span>Take your time ♡</span>
+                    </div>
 
-    <div>
+                    <textarea
+                        id="content"
+                        name="content"
+                        rows="10"
+                        placeholder="Start writing here...
 
-        <h3>{{ entry.title }}</h3>
+What has been on your mind today?
+What made you smile, worry, or feel grateful?"
+                        required
+                    ></textarea>
 
-        <p>
-            {{ entry.content }}
-        </p>
+                    <div class="form-footer">
+                        <span class="private-note">♡ A space for honest reflection</span>
+                        <button type="submit">Save my entry <span>→</span></button>
+                    </div>
+                </form>
+            </section>
 
-        <p>
-            <strong>AI Sentiment:</strong>
-            {{ entry.sentiment }}
-        </p>
+            <aside class="reflection-card">
+                <div class="reflection-icon">☁</div>
+                <p class="eyebrow">A GENTLE PROMPT</p>
+                <h3>Check in with yourself</h3>
+                <p>Sometimes a small question can help us understand a big feeling.</p>
 
-        <p>
-            <strong>Sentiment Score:</strong>
-            {{ entry.sentiment_score }}
-        </p>
+                <div class="prompt-box">
+                    <span>TRY REFLECTING ON</span>
+                    <p>“What is one thing I need more of in my life right now?”</p>
+                </div>
 
-        <small>
-            {{ entry.created_at }}
-        </small>
+                <div class="reflection-footer">
+                    <span>✦</span>
+                    <p>You don't have to figure everything out today.</p>
+                </div>
+            </aside>
 
-    </div>
+        </div>
 
-    <hr>
+        <section class="history-section">
+            <div class="history-header">
+                <div>
+                    <p class="eyebrow">YOUR PERSONAL JOURNEY</p>
+                    <h2>Previous journal entries</h2>
+                    <p class="history-subtitle">Look back at your thoughts and notice how you grow.</p>
+                </div>
+                <span class="history-icon">▤</span>
+            </div>
 
-{% empty %}
+            <div class="entries-list">
+                {% for entry in journals %}
+                    <article class="entry-card">
+                        <div class="entry-top">
+                            <div class="entry-title-wrap">
+                                <span class="entry-icon">✎</span>
+                                <div>
+                                    <h3>{{ entry.title }}</h3>
+                                    <small>{{ entry.created_at|date:"M d, Y · h:i A" }}</small>
+                                </div>
+                            </div>
+                            <span class="entry-number">REFLECTION</span>
+                        </div>
 
-    <p>No journal entries yet.</p>
+                        <p class="entry-content">{{ entry.content|linebreaksbr }}</p>
 
-{% endfor %}
+                        <div class="sentiment-row">
+                            <div class="sentiment-item">
+                                <span class="sentiment-label">AI Sentiment</span>
+                                <span class="sentiment-value">{{ entry.sentiment|default:"Not available" }}</span>
+                            </div>
+                            <div class="sentiment-item">
+                                <span class="sentiment-label">Sentiment Score</span>
+                                <span class="sentiment-value">{{ entry.sentiment_score|default:"Not available" }}</span>
+                            </div>
+                        </div>
+                    </article>
+                {% empty %}
+                    <div class="empty-state">
+                        <div class="empty-icon">✧</div>
+                        <h3>Your story starts here</h3>
+                        <p>You haven't written a journal entry yet. When you're ready, write your first reflection above.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
 
-<br>
+        <footer class="page-footer">
+            <span>MindCare AI</span>
+            <span>Be kind to yourself, always. ♡</span>
+        </footer>
 
-<a href="{% url 'dashboard' %}">
-    Back to Dashboard
-</a>
+    </main>
+</div>
+
+</body>
+</html>

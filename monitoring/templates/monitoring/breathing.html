@@ -1,193 +1,418 @@
+
+{% load static %}
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
-    <title>Breathing Exercise - MindCare AI</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breathing Exercise | MindCare AI</title>
+    <link rel="stylesheet" href="{% static 'css/breathing.css' %}">
 </head>
-
 <body>
 
-    <h1>Breathing Exercise</h1>
+<div class="app-layout">
 
-    <p>
-        Take a few minutes to relax and focus on your breathing.
-    </p>
+    <aside class="sidebar">
+        <a href="{% url 'dashboard' %}" class="brand">
+            <span class="brand-icon">✦</span>
+            <span>MindCare <small>AI WELLNESS</small></span>
+        </a>
 
-    <h2 id="phase">Ready</h2>
+        <p class="nav-heading">YOUR WELLNESS</p>
 
-    <h1 id="timer">0</h1>
+        <nav class="navigation">
+            <a href="{% url 'dashboard' %}" class="nav-link"><span>⌂</span> Dashboard</a>
+            <a href="{% url 'mood' %}" class="nav-link"><span>☻</span> Mood Tracking</a>
+            <a href="{% url 'sleep' %}" class="nav-link"><span>☾</span> Sleep Tracking</a>
+            <a href="{% url 'journal' %}" class="nav-link"><span>▤</span> My Journal</a>
+            <a href="{% url 'stress' %}" class="nav-link"><span>♡</span> Stress Tracking</a>
+            <a href="{% url 'breathing' %}" class="nav-link active"><span>◎</span> Breathing</a>
+            <a href="{% url 'heart_rate' %}" class="nav-link"><span>♡</span> Heart Rate</a>
+            <a href="{% url 'distress_prediction' %}" class="nav-link"><span>✧</span> AI Insights</a>
+        </nav>
 
-    <button onclick="startBreathing()">
-        Start Exercise
-    </button>
+        <div class="sidebar-note">
+            <div class="note-icon">🌿</div>
+            <h3>Slow down a little</h3>
+            <p>You can always take a moment to pause, breathe, and begin again.</p>
+        </div>
 
-    <br><br>
+        <a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
+    </aside>
 
-    <form method="POST" id="completeForm" style="display: none;">
+    <main class="main-content">
 
-    {% csrf_token %}
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">PAUSE · BREATHE · RESET</p>
+                <h1>Breathing Exercise <span>◎</span></h1>
+            </div>
+            <div class="date-chip">♡ &nbsp; Your moment of calm</div>
+        </header>
 
-    <button type="submit">
-        Save Completed Session
-    </button>
+        <section class="welcome-banner">
+            <div class="welcome-text">
+                <span class="banner-label">A LITTLE SPACE FOR YOURSELF</span>
+                <h2>Find your calm, one breath at a time.</h2>
+                <p>Set aside five minutes to slow down and focus on your breathing. Follow the gentle rhythm, and go at a pace that feels comfortable for you.</p>
+                <div class="banner-meta">
+                    <span>◷ &nbsp; 5-minute session</span>
+                    <span>✦ &nbsp; Guided breathing</span>
+                </div>
+            </div>
+            <div class="banner-decoration" aria-hidden="true">
+                <div class="sun-circle">☁</div>
+                <span class="decor-leaf leaf-one">❧</span>
+                <span class="decor-star">✦</span>
+            </div>
+        </section>
 
-</form>
+        <section class="practice-grid">
 
-    <hr>
+            <div class="breathing-card">
+                <div class="practice-heading">
+                    <div>
+                        <p class="eyebrow">GUIDED PRACTICE</p>
+                        <h2>Your breathing space</h2>
+                    </div>
+                    <span class="live-indicator"><span></span> SELF-CARE</span>
+                </div>
 
-    <h2>Previous Breathing Sessions</h2>
+                <p class="practice-description">Sit comfortably, relax your shoulders, and follow the circle.</p>
 
-    {% for breathing in breathings %}
+                <div class="breathing-stage" id="breathingStage">
+                    <div class="circle-halo"></div>
+                    <div class="breathing-circle" id="breathingCircle">
+                        <div class="circle-inner">
+                            <span class="circle-symbol" id="circleSymbol">✦</span>
+                            <span class="circle-phase" id="circlePhase">Ready</span>
+                            <strong id="timer">0</strong>
+                            <span class="circle-caption" id="circleCaption">Begin when you're ready</span>
+                        </div>
+                    </div>
+                </div>
 
-        <p>
-            Completed {{ breathing.duration }} minute session
-        </p>
+                <div class="phase-guide">
+                    <div class="phase-item" id="inhaleGuide">
+                        <span class="phase-dot inhale-dot"></span>
+                        <div><strong>Inhale</strong><small>4 seconds</small></div>
+                    </div>
+                    <div class="phase-item" id="holdGuide">
+                        <span class="phase-dot hold-dot"></span>
+                        <div><strong>Hold</strong><small>4 seconds</small></div>
+                    </div>
+                    <div class="phase-item" id="exhaleGuide">
+                        <span class="phase-dot exhale-dot"></span>
+                        <div><strong>Exhale</strong><small>6 seconds</small></div>
+                    </div>
+                </div>
 
-        <small>
-            {{ breathing.created_at }}
-        </small>
+                <div class="session-progress">
+                    <div class="progress-labels">
+                        <span>Session progress</span>
+                        <strong id="progressText">0%</strong>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="time-labels">
+                        <span id="elapsedTime">00:00 elapsed</span>
+                        <span id="remainingTime">05:00 remaining</span>
+                    </div>
+                </div>
 
-        <hr>
+                <div class="controls">
+                    <button type="button" class="primary-button" id="startButton" onclick="startBreathing()">
+                        <span>▶</span> Start Exercise
+                    </button>
+                    <button type="button" class="secondary-button" id="pauseButton" onclick="togglePause()" disabled>
+                        <span>Ⅱ</span> Pause
+                    </button>
+                    <button type="button" class="reset-button" onclick="resetBreathing()" aria-label="Reset breathing exercise">
+                        ↻
+                    </button>
+                </div>
 
-    {% empty %}
+                <p class="control-hint" id="controlHint">When you're ready, start your five-minute session.</p>
 
-        <p>No breathing sessions yet.</p>
+                <div class="completion-box" id="completionBox" hidden>
+                    <div class="completion-icon">✓</div>
+                    <h3>Beautifully done!</h3>
+                    <p>You completed your breathing session. Take a moment to notice how you feel.</p>
+                    <form method="POST" id="completeForm">
+                        {% csrf_token %}
+                        <button type="submit" class="primary-button save-button">Save Completed Session <span>→</span></button>
+                    </form>
+                </div>
+            </div>
 
-    {% endfor %}
+            <aside class="tips-column">
+                <div class="tip-card">
+                    <div class="tip-icon">🌱</div>
+                    <p class="eyebrow">A GENTLE REMINDER</p>
+                    <h3>There is no need to rush.</h3>
+                    <p>Let your breathing stay comfortable and natural. If you feel dizzy or uncomfortable, stop and breathe normally.</p>
+                </div>
 
-    <br>
+                <div class="steps-card">
+                    <p class="eyebrow">YOUR BREATHING RHYTHM</p>
+                    <h3>Follow these three steps</h3>
 
-    <a href="{% url 'dashboard' %}">
-        Back to Dashboard
-    </a>
+                    <div class="step-row">
+                        <span class="step-number step-green">01</span>
+                        <div><strong>Breathe in</strong><p>Gently inhale for four seconds.</p></div>
+                    </div>
+                    <div class="step-row">
+                        <span class="step-number step-purple">02</span>
+                        <div><strong>Pause</strong><p>Hold gently for four seconds, if comfortable.</p></div>
+                    </div>
+                    <div class="step-row">
+                        <span class="step-number step-blue">03</span>
+                        <div><strong>Breathe out</strong><p>Slowly exhale for six seconds.</p></div>
+                    </div>
+                </div>
+            </aside>
 
+        </section>
 
-    <script>
+        <section class="history-section">
+            <div class="history-header">
+                <div>
+                    <p class="eyebrow">YOUR WELLNESS JOURNEY</p>
+                    <h2>Previous breathing sessions</h2>
+                    <p>Every small moment of care counts.</p>
+                </div>
+                <span class="history-icon">◷</span>
+            </div>
 
-        let phase = "ready";
-        let time = 0;
-        let running = false;
-        let cycles = 0;
-        let totalTime = 300;
+            <div class="history-list">
+                {% for breathing in breathings %}
+                    <article class="history-entry">
+                        <span class="history-entry-icon">◎</span>
+                        <div class="history-entry-details">
+                            <h3>Breathing session completed</h3>
+                            <p>{{ breathing.duration }} minute session</p>
+                            <small>{{ breathing.created_at }}</small>
+                        </div>
+                        <span class="completed-tag">✓ Completed</span>
+                    </article>
+                {% empty %}
+                    <div class="empty-state">
+                        <div>☁</div>
+                        <h3>Your breathing journey starts here</h3>
+                        <p>Complete your first session, and it will appear here.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
 
+        <footer class="page-footer">
+            <span>MindCare AI</span>
+            <span>Be kind to yourself, always. ♡</span>
+        </footer>
 
-        function startBreathing() {
+    </main>
+</div>
 
-            if (running) {
-                return;
+<script>
+    const SESSION_LENGTH = 300;
+    const phaseLengths = {
+        Inhale: 4,
+        Hold: 4,
+        Exhale: 6
+    };
+
+    let running = false;
+    let paused = false;
+    let completed = false;
+    let remainingSeconds = SESSION_LENGTH;
+    let phase = "Ready";
+    let phaseSeconds = 0;
+    let intervalId = null;
+
+    const phaseElement = document.getElementById("circlePhase");
+    const timerElement = document.getElementById("timer");
+    const captionElement = document.getElementById("circleCaption");
+    const circle = document.getElementById("breathingCircle");
+    const startButton = document.getElementById("startButton");
+    const pauseButton = document.getElementById("pauseButton");
+    const completionBox = document.getElementById("completionBox");
+    const controlHint = document.getElementById("controlHint");
+
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return String(minutes).padStart(2, "0") + ":" +
+               String(secs).padStart(2, "0");
+    }
+
+    function updateProgress() {
+        const elapsed = SESSION_LENGTH - remainingSeconds;
+        const percentage = Math.floor((elapsed / SESSION_LENGTH) * 100);
+
+        document.getElementById("progressFill").style.width = percentage + "%";
+        document.getElementById("progressText").textContent = percentage + "%";
+        document.getElementById("elapsedTime").textContent =
+            formatTime(elapsed) + " elapsed";
+        document.getElementById("remainingTime").textContent =
+            formatTime(remainingSeconds) + " remaining";
+    }
+
+    function updatePhaseDisplay() {
+        phaseElement.textContent = phase;
+        timerElement.textContent = phaseSeconds;
+        document.getElementById("circleSymbol").textContent =
+            phase === "Inhale" ? "↑" :
+            phase === "Hold" ? "· · ·" :
+            phase === "Exhale" ? "↓" : "✦";
+
+        document.getElementById("inhaleGuide").classList.toggle("phase-active", phase === "Inhale");
+        document.getElementById("holdGuide").classList.toggle("phase-active", phase === "Hold");
+        document.getElementById("exhaleGuide").classList.toggle("phase-active", phase === "Exhale");
+
+        circle.classList.remove("inhale", "hold", "exhale");
+
+        if (phase === "Inhale") {
+            circle.classList.add("inhale");
+            captionElement.textContent = "Breathe in gently";
+        } else if (phase === "Hold") {
+            circle.classList.add("hold");
+            captionElement.textContent = "Pause, if comfortable";
+        } else if (phase === "Exhale") {
+            circle.classList.add("exhale");
+            captionElement.textContent = "Breathe out slowly";
+        }
+    }
+
+    function beginPhase(nextPhase) {
+        phase = nextPhase;
+        phaseSeconds = phaseLengths[nextPhase];
+        updatePhaseDisplay();
+    }
+
+    function startBreathing() {
+        if (running || completed) return;
+
+        if (remainingSeconds === SESSION_LENGTH) {
+            beginPhase("Inhale");
+        }
+
+        running = true;
+        paused = false;
+        startButton.disabled = true;
+        pauseButton.disabled = false;
+        startButton.innerHTML = "<span>▶</span> Exercise in progress";
+        pauseButton.innerHTML = "<span>Ⅱ</span> Pause";
+        controlHint.textContent = "Follow the circle and breathe at a comfortable pace.";
+
+        intervalId = setInterval(tick, 1000);
+    }
+
+    function tick() {
+        if (!running || paused) return;
+
+        remainingSeconds--;
+        phaseSeconds--;
+
+        if (remainingSeconds <= 0) {
+            remainingSeconds = 0;
+            updateProgress();
+            finishBreathing();
+            return;
+        }
+
+        if (phaseSeconds <= 0) {
+            if (phase === "Inhale") {
+                beginPhase("Hold");
+            } else if (phase === "Hold") {
+                beginPhase("Exhale");
+            } else {
+                beginPhase("Inhale");
             }
-
-            running = true;
-            cycles = 0;
-            totalTime = 300;
-
-            inhale();
-
+        } else {
+            timerElement.textContent = phaseSeconds;
         }
 
+        updateProgress();
+    }
 
-        function inhale() {
+    function togglePause() {
+        if (!running || completed) return;
 
-            phase = "Inhale";
-            time = 4;
+        paused = !paused;
+        pauseButton.innerHTML = paused
+            ? "<span>▶</span> Resume"
+            : "<span>Ⅱ</span> Pause";
 
-            document.getElementById("phase").innerText = phase;
+        controlHint.textContent = paused
+            ? "Paused. Resume whenever you feel ready."
+            : "Welcome back. Continue at your own comfortable pace.";
 
-            countdown();
+        circle.classList.toggle("paused", paused);
+    }
 
-        }
+    function finishBreathing() {
+        clearInterval(intervalId);
+        intervalId = null;
+        running = false;
+        paused = false;
+        completed = true;
+        phase = "Complete";
 
+        phaseElement.textContent = "Session complete";
+        timerElement.textContent = "✓";
+        document.getElementById("circleSymbol").textContent = "✦";
+        captionElement.textContent = "You made time for yourself";
+        circle.classList.remove("inhale", "hold", "exhale", "paused");
+        circle.classList.add("complete");
 
-        function hold() {
+        document.getElementById("inhaleGuide").classList.remove("phase-active");
+        document.getElementById("holdGuide").classList.remove("phase-active");
+        document.getElementById("exhaleGuide").classList.remove("phase-active");
 
-            phase = "Hold";
-            time = 4;
+        startButton.disabled = true;
+        pauseButton.disabled = true;
+        startButton.innerHTML = "<span>✓</span> Completed";
+        controlHint.textContent = "Take a moment to notice how you feel.";
+        completionBox.hidden = false;
+    }
 
-            document.getElementById("phase").innerText = phase;
+    function resetBreathing() {
+        clearInterval(intervalId);
+        intervalId = null;
 
-            countdown();
+        running = false;
+        paused = false;
+        completed = false;
+        remainingSeconds = SESSION_LENGTH;
+        phase = "Ready";
+        phaseSeconds = 0;
 
-        }
+        phaseElement.textContent = "Ready";
+        timerElement.textContent = "0";
+        document.getElementById("circleSymbol").textContent = "✦";
+        captionElement.textContent = "Begin when you're ready";
 
+        circle.classList.remove("inhale", "hold", "exhale", "paused", "complete");
+        document.getElementById("inhaleGuide").classList.remove("phase-active");
+        document.getElementById("holdGuide").classList.remove("phase-active");
+        document.getElementById("exhaleGuide").classList.remove("phase-active");
 
-        function exhale() {
+        startButton.disabled = false;
+        pauseButton.disabled = true;
+        startButton.innerHTML = "<span>▶</span> Start Exercise";
+        pauseButton.innerHTML = "<span>Ⅱ</span> Pause";
+        completionBox.hidden = true;
+        controlHint.textContent = "When you're ready, start your five-minute session.";
 
-            phase = "Exhale";
-            time = 6;
+        updateProgress();
+    }
 
-            document.getElementById("phase").innerText = phase;
-
-            countdown();
-
-        }
-
-
-        function countdown() {
-
-            document.getElementById("timer").innerText = time;
-
-            let interval = setInterval(function() {
-
-                time--;
-                totalTime--;
-
-                document.getElementById("timer").innerText = time;
-
-
-                if (totalTime <= 0) {
-
-                    clearInterval(interval);
-
-                    running = false;
-
-                   document.getElementById("phase").innerText =
-    "Exercise Complete!";
-
-document.getElementById("timer").innerText = "✓";
-
-document.getElementById("completeForm").style.display = "block";
-
-return;
-
-                }
-
-
-                if (time <= 0) {
-
-                    clearInterval(interval);
-
-
-                    if (phase == "Inhale") {
-
-                        hold();
-
-                    }
-
-                    else if (phase == "Hold") {
-
-                        exhale();
-
-                    }
-
-                    else if (phase == "Exhale") {
-
-                        cycles++;
-
-                        inhale();
-
-                    }
-
-                }
-
-            }, 1000);
-
-        }
-
-    </script>
+    updateProgress();
+</script>
 
 </body>
+<<<<<<< HEAD
 
 </html>
 
@@ -197,3 +422,6 @@ return;
 
 
 
+=======
+</html>
+>>>>>>> 3033378 (11.10.26)

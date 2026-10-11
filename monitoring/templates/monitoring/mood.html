@@ -1,105 +1,188 @@
+
+{% load static %}
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>Mood Tracking - MindCare AI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Tracker | MindCare AI</title>
+    <link rel="stylesheet" href="{% static 'css/mood.css' %}">
 </head>
-
 <body>
+<div class="page-layout">
 
-    <h1>How are you feeling today?</h1>
+    <aside class="sidebar">
+        <a href="{% url 'dashboard' %}" class="brand">
+            <span class="brand-icon">✿</span>
+            <span>MindCare <span class="brand-ai">AI</span></span>
+        </a>
 
-    <form method="POST">
+        <p class="nav-heading">WORKSPACE</p>
 
-        {% csrf_token %}
+        <nav class="navigation">
+            <a href="{% url 'dashboard' %}" class="nav-link">▦ &nbsp; Dashboard</a>
+            <a href="{% url 'mood' %}" class="nav-link active">☻ &nbsp; Mood Tracker</a>
+            <a href="{% url 'sleep' %}" class="nav-link">☾ &nbsp; Sleep Tracker</a>
+            <a href="{% url 'journal' %}" class="nav-link">▤ &nbsp; My Journal</a>
+            <a href="{% url 'stress' %}" class="nav-link">♡ &nbsp; Stress Assessment</a>
+            <a href="{% url 'breathing' %}" class="nav-link">◉ &nbsp; Breathing Exercise</a>
+            <a href="{% url 'distress_prediction' %}" class="nav-link">✧ &nbsp; AI Insights</a>
+            <a href="{% url 'heart_rate' %}" class="nav-link">♡ &nbsp; Heart Rate</a>
+        </nav>
 
-        <label>Select your mood:</label>
-
-        <select name="mood" required>
-
-            <option value="">-- Select Mood --</option>
-
-            <option value="excellent">
-                😊 Excellent
-            </option>
-
-            <option value="good">
-                🙂 Good
-            </option>
-
-            <option value="okay">
-                😐 Okay
-            </option>
-
-            <option value="sad">
-                😔 Sad
-            </option>
-
-            <option value="very_sad">
-                😢 Very Sad
-            </option>
-
-        </select>
-
-        <br><br>
-
-        <label>How was your day?</label>
-
-        <br>
-
-        <textarea
-            name="note"
-            rows="5"
-            cols="40"
-            placeholder="Write something about your day..."
-        ></textarea>
-
-        <br><br>
-
-        <button type="submit">
-            Save Mood
-        </button>
-
-    </form>
-
-
-    <hr>
-
-    <h2>Your Previous Mood Entries</h2>
-
-    {% for entry in moods %}
-
-        <div>
-
-            <p>
-                <strong>{{ entry.get_mood_display }}</strong>
-            </p>
-
-            <p>
-                {{ entry.note }}
-            </p>
-
-            <small>
-                {{ entry.created_at }}
-            </small>
-
+        <div class="sidebar-bottom">
+            <a href="{% url 'profile' %}" class="nav-link">⚙ &nbsp; My Profile</a>
         </div>
+    </aside>
 
-        <hr>
+    <main class="main-content">
 
-    {% empty %}
+        <header class="page-header">
+            <div>
+                <p class="eyebrow">YOUR PERSONAL WELLNESS SPACE</p>
+                <h1>How are you feeling today?</h1>
+                <p class="subtitle">
+                    Every feeling deserves a little attention. Take a moment for yourself.
+                </p>
+            </div>
+            <a href="{% url 'dashboard' %}" class="back-button">← Dashboard</a>
+        </header>
 
-        <p>No mood entries yet.</p>
+        <section class="mood-banner">
+            <div>
+                <span class="banner-label">A MOMENT FOR YOU</span>
+                <h2>Check in with yourself.</h2>
+                <p>There are no right or wrong feelings. Just choose what feels closest to you.</p>
+            </div>
+            <div class="banner-flower" aria-hidden="true">✿</div>
+        </section>
 
-    {% endfor %}
+        <section class="form-card">
+            <div class="section-title">
+                <span class="step-number">01</span>
+                <div>
+                    <h2>Choose your mood</h2>
+                    <p>How would you describe how you feel right now?</p>
+                </div>
+            </div>
 
+            <form method="POST">
+                {% csrf_token %}
 
-    <br>
+                <div class="mood-options">
+                    <label class="mood-option excellent">
+                        <input type="radio" name="mood" value="excellent" required>
+                        <span class="mood-emoji">😊</span>
+                        <span class="mood-name">Excellent</span>
+                        <span class="mood-description">Feeling wonderful</span>
+                    </label>
 
-    <a href="{% url 'dashboard' %}">
-        Back to Dashboard
-    </a>
+                    <label class="mood-option good">
+                        <input type="radio" name="mood" value="good" required>
+                        <span class="mood-emoji">🙂</span>
+                        <span class="mood-name">Good</span>
+                        <span class="mood-description">Doing pretty well</span>
+                    </label>
 
+                    <label class="mood-option okay">
+                        <input type="radio" name="mood" value="okay" required>
+                        <span class="mood-emoji">😐</span>
+                        <span class="mood-name">Okay</span>
+                        <span class="mood-description">An ordinary day</span>
+                    </label>
+
+                    <label class="mood-option sad">
+                        <input type="radio" name="mood" value="sad" required>
+                        <span class="mood-emoji">😔</span>
+                        <span class="mood-name">Sad</span>
+                        <span class="mood-description">Feeling a little low</span>
+                    </label>
+
+                    <label class="mood-option very-sad">
+                        <input type="radio" name="mood" value="very_sad" required>
+                        <span class="mood-emoji">😢</span>
+                        <span class="mood-name">Very sad</span>
+                        <span class="mood-description">Having a hard time</span>
+                    </label>
+                </div>
+
+                <div class="section-title note-title">
+                    <span class="step-number">02</span>
+                    <div>
+                        <h2>Tell us a little more</h2>
+                        <p>Writing can help you reflect on your day.</p>
+                    </div>
+                </div>
+
+                <label class="field-label" for="note">Your thoughts (optional)</label>
+                <textarea
+                    id="note"
+                    name="note"
+                    rows="5"
+                    maxlength="5000"
+                    placeholder="What happened today? What might be affecting your mood?"
+                ></textarea>
+
+                <div class="form-footer">
+                    <span class="privacy-note">♡ Your feelings matter. Take your time.</span>
+                    <button type="submit" class="save-button">
+                        Save my mood <span>→</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="history-section">
+            <div class="history-heading">
+                <div>
+                    <p class="eyebrow">YOUR JOURNEY</p>
+                    <h2>Previous mood entries</h2>
+                    <p class="subtitle">Look back at the feelings you've recorded.</p>
+                </div>
+                <span class="entry-count">
+                    {{ moods|length }} entries
+                </span>
+            </div>
+
+            <div class="history-list">
+                {% for entry in moods %}
+                    <article class="history-card">
+                        <div class="history-emoji">
+                            {% if entry.mood == 'excellent' %}😊
+                            {% elif entry.mood == 'good' %}🙂
+                            {% elif entry.mood == 'okay' %}😐
+                            {% elif entry.mood == 'sad' %}😔
+                            {% elif entry.mood == 'very_sad' %}😢
+                            {% else %}♡
+                            {% endif %}
+                        </div>
+
+                        <div class="history-content">
+                            <h3>{{ entry.get_mood_display|default:entry.mood }}</h3>
+                            {% if entry.note %}
+                                <p>{{ entry.note|linebreaksbr }}</p>
+                            {% else %}
+                                <p class="muted-text">No notes added for this entry.</p>
+                            {% endif %}
+                            <span class="entry-date">
+                                {{ entry.created_at|date:"d M Y, g:i A" }}
+                            </span>
+                        </div>
+                    </article>
+                {% empty %}
+                    <div class="empty-state">
+                        <span>🌱</span>
+                        <h3>Your story starts here</h3>
+                        <p>Your saved mood entries will appear here. Record your first check-in above.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <footer class="page-footer">
+            MindCare AI · One feeling at a time.
+        </footer>
+    </main>
+</div>
 </body>
-
 </html>

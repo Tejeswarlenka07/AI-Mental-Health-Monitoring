@@ -1,11 +1,218 @@
+```html
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Home</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MindCare AI helps you track your mood, sleep, stress, and daily wellness habits.">
+    <title>MindCare AI | Your Wellness Journey</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
 </head>
+
 <body>
+    <!-- Navigation -->
+    <header class="navbar">
+        <a href="{% url 'home' %}" class="brand">
+            <span class="brand-icon">✦</span>
+            <span>MindCare <strong>AI</strong></span>
+        </a>
 
-    <h1>AI Mental Health Monitoring</h1>
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="#features">Features</a>
+            <a href="#about">About</a>
+        </nav>
 
+        <div class="nav-actions">
+            <a href="{% url 'login' %}" class="login-link">Login</a>
+            <a href="{% url 'register' %}" class="nav-button">Get Started <span>→</span></a>
+        </div>
+    </header>
+
+    <!-- Hero section -->
+    <main>
+        <section class="hero" id="about">
+            <div class="hero-content">
+                <div class="hero-tag">
+                    <span class="tag-dot"></span>
+                    YOUR PERSONAL WELLNESS SPACE
+                </div>
+
+                <h1>
+                    Take a breath.<br>
+                    <span>Care for your mind.</span>
+                </h1>
+
+                <p class="hero-description">
+                    Understand your emotions, build healthier habits,
+                    and make time for yourself with MindCare AI.
+                    Your journey toward better wellbeing starts with
+                    one small step.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="{% url 'register' %}" class="primary-button">
+                        Start Your Journey <span>→</span>
+                    </a>
+                    <a href="{% url 'login' %}" class="secondary-button">
+                        I already have an account
+                    </a>
+                </div>
+
+                <div class="hero-note">
+                    <span class="note-icon">🌱</span>
+                    <p>Small steps. Healthier habits. A little more self-care.</p>
+                </div>
+            </div>
+
+            <!-- Decorative wellness card -->
+            <div class="hero-visual">
+                <div class="decor decor-one"></div>
+                <div class="decor decor-two"></div>
+
+                <div class="wellness-card">
+                    <div class="card-top">
+                        <div>
+                            <span class="card-eyebrow">YOUR DAILY REMINDER</span>
+                            <h2>Check in with yourself</h2>
+                        </div>
+                        <span class="sun-icon">☀</span>
+                    </div>
+
+                    <div class="illustration">
+                        <div class="illustration-circle">
+                            <span class="illustration-leaf">❋</span>
+                        </div>
+                        <div class="illustration-ground"></div>
+                    </div>
+
+                    <div class="quote-card">
+                        <span class="quote-symbol">“</span>
+                        <p>
+                            You don't have to have it all figured out
+                            to take care of yourself today.
+                        </p>
+                    </div>
+
+                    <div class="card-bottom">
+                        <span class="status-dot"></span>
+                        <span>Make today a little more mindful</span>
+                    </div>
+                </div>
+
+                <div class="floating-badge badge-top">
+                    <span class="floating-icon">💚</span>
+                    <div>
+                        <strong>Your wellbeing</strong>
+                        <small>Deserves your attention</small>
+                    </div>
+                </div>
+
+                <div class="floating-badge badge-bottom">
+                    <span class="floating-icon">🌿</span>
+                    <div>
+                        <strong>One day at a time</strong>
+                        <small>Progress, not perfection</small>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="features-section" id="features">
+            <div class="section-heading">
+                <span class="section-tag">MADE FOR YOUR WELLBEING</span>
+                <h2>A little care goes a long way.</h2>
+                <p>
+                    Simple tools to help you reflect, understand your
+                    habits, and create a healthier routine.
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <article class="feature-card mood-card">
+                    <div class="feature-icon">☁</div>
+                    <h3>Mood Tracking</h3>
+                    <p>
+                        Record how you feel and reflect on your emotional
+                        wellbeing over time.
+                    </p>
+                    <span class="feature-number">01</span>
+                </article>
+
+                <article class="feature-card sleep-card">
+                    <div class="feature-icon">☾</div>
+                    <h3>Sleep Monitoring</h3>
+                    <p>
+                        Keep track of your sleeping hours and the quality
+                        of your rest.
+                    </p>
+                    <span class="feature-number">02</span>
+                </article>
+
+                <article class="feature-card journal-card">
+                    <div class="feature-icon">✎</div>
+                    <h3>Personal Journal</h3>
+                    <p>
+                        Put your thoughts into words and reflect on the
+                        sentiment in your writing.
+                    </p>
+                    <span class="feature-number">03</span>
+                </article>
+
+                <article class="feature-card stress-card">
+                    <div class="feature-icon">♡</div>
+                    <h3>Stress Assessment</h3>
+                    <p>
+                        Reflect on your stress levels through a simple
+                        self-assessment.
+                    </p>
+                    <span class="feature-number">04</span>
+                </article>
+
+                <article class="feature-card breathing-card">
+                    <div class="feature-icon">❋</div>
+                    <h3>Breathing Exercises</h3>
+                    <p>
+                        Take a mindful break with a guided breathing
+                        exercise.
+                    </p>
+                    <span class="feature-number">05</span>
+                </article>
+
+                <article class="feature-card ai-card">
+                    <div class="feature-icon">✦</div>
+                    <h3>AI-Based Insights</h3>
+                    <p>
+                        Explore model-generated wellness insights based
+                        on the information you record.
+                    </p>
+                    <span class="feature-number">06</span>
+                </article>
+            </div>
+
+            <div class="features-cta">
+                <div>
+                    <h2>Make a little time for yourself.</h2>
+                    <p>Your wellness journey begins with a simple check-in.</p>
+                </div>
+                <a href="{% url 'register' %}" class="primary-button">
+                    Create Your Account <span>→</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <a href="{% url 'home' %}" class="brand footer-brand">
+            <span class="brand-icon">✦</span>
+            <span>MindCare <strong>AI</strong></span>
+        </a>
+
+        <p>Take care of your mind. Your wellbeing matters.</p>
+        <span class="copyright">© 2026 MindCare AI</span>
+    </footer>
 </body>
 </html>
+```

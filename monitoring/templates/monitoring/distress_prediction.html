@@ -1,6 +1,8 @@
 {% load static %}
 
+{% load static %}
 <!DOCTYPE html>
+<<<<<<< HEAD
 
 <html>
 
@@ -12,10 +14,18 @@
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
 ```
 
+=======
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Distress Prediction | MindCare AI</title>
+    <link rel="stylesheet" href="{% static 'css/distress_prediction.css' %}">
+>>>>>>> 3033378 (11.10.26)
 </head>
-
 <body>
 
+<<<<<<< HEAD
 ```
 <nav class="navbar">
 
@@ -188,7 +198,195 @@
 
 </footer>
 ```
+=======
+<div class="app-layout">
+
+    <aside class="sidebar">
+        <a href="{% url 'dashboard' %}" class="brand">
+            <span class="brand-icon">✦</span>
+            <span>MindCare <small>AI WELLNESS</small></span>
+        </a>
+
+        <p class="nav-heading">YOUR WELLNESS</p>
+
+        <nav class="navigation">
+            <a href="{% url 'dashboard' %}" class="nav-link"><span>⌂</span> Dashboard</a>
+            <a href="{% url 'mood' %}" class="nav-link"><span>☻</span> Mood Tracking</a>
+            <a href="{% url 'sleep' %}" class="nav-link"><span>☾</span> Sleep Tracking</a>
+            <a href="{% url 'journal' %}" class="nav-link"><span>▤</span> My Journal</a>
+            <a href="{% url 'stress' %}" class="nav-link"><span>♡</span> Stress Tracking</a>
+            <a href="{% url 'breathing' %}" class="nav-link"><span>◎</span> Breathing</a>
+            <a href="{% url 'heart_rate' %}" class="nav-link"><span>♡</span> Heart Rate</a>
+            <a href="{% url 'distress_prediction' %}" class="nav-link active"><span>✧</span> AI Insights</a>
+        </nav>
+
+        <div class="sidebar-note">
+            <div class="note-icon">🌿</div>
+            <h3>You are more than a score</h3>
+            <p>Your well-being is personal. Use these insights as one small part of your self-care journey.</p>
+        </div>
+
+        <a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">PERSONALIZED WELLNESS INSIGHTS</p>
+                <h1>AI Distress Prediction <span>✧</span></h1>
+            </div>
+            <div class="date-chip">✦ &nbsp; Your wellness overview</div>
+        </header>
+
+        <section class="welcome-banner">
+            <div class="welcome-text">
+                <span class="banner-label">UNDERSTAND · REFLECT · CARE</span>
+                <h2>Understand your patterns with a little more clarity.</h2>
+                <p>Review the distress level predicted by your AI model alongside the wellness information used to generate the result.</p>
+                <div class="banner-meta">
+                    <span>✧ &nbsp; AI-generated estimate</span>
+                    <span>♡ &nbsp; A starting point for reflection</span>
+                </div>
+            </div>
+            <div class="banner-decoration" aria-hidden="true">
+                <div class="insight-orbit">
+                    <span>✧</span>
+                </div>
+                <span class="decor-star star-one">✦</span>
+                <span class="decor-star star-two">✧</span>
+            </div>
+        </section>
+
+        <section class="result-card">
+            <div class="result-top">
+                <div class="result-icon">✧</div>
+                <div>
+                    <p class="eyebrow">YOUR MODEL'S OUTPUT</p>
+                    <h2>Predicted distress level</h2>
+                    <p class="result-description">This is the result returned by your current AI prediction system.</p>
+                </div>
+            </div>
+
+            <div class="prediction-result">
+                <span class="result-label">PREDICTION</span>
+                <h3>{{ distress_level|default:"Not available" }}</h3>
+                <p>The prediction is an estimate, not a clinical diagnosis.</p>
+            </div>
+
+            <div class="result-disclaimer">
+                <span>ⓘ</span>
+                <p>Consider this result alongside your own experience. AI predictions can be incomplete or inaccurate, and the result alone cannot determine your mental health.</p>
+            </div>
+        </section>
+
+        <section class="data-section">
+            <div class="section-header">
+                <div>
+                    <p class="eyebrow">MODEL INPUTS</p>
+                    <h2>Data used by AI</h2>
+                    <p>These are the wellness values supplied to your prediction page.</p>
+                </div>
+                <span class="section-icon">▤</span>
+            </div>
+
+            <div class="data-grid">
+
+                <article class="data-card">
+                    <div class="data-card-top">
+                        <span class="data-icon mood-icon">☻</span>
+                        <span class="data-category">MOOD</span>
+                    </div>
+                    <p class="data-label">Latest mood</p>
+                    <h3>{{ mood|default:"Not available" }}</h3>
+                    <p class="data-help">Your recorded emotional check-in.</p>
+                </article>
+
+                <article class="data-card">
+                    <div class="data-card-top">
+                        <span class="data-icon sleep-icon">☾</span>
+                        <span class="data-category">SLEEP</span>
+                    </div>
+                    <p class="data-label">Sleep duration</p>
+                    <h3>{{ sleep_hours|default:"Not available" }}{% if sleep_hours != None and sleep_hours != "" %} <small>hours</small>{% endif %}</h3>
+                    <p class="data-help">The sleep duration used by the model.</p>
+                </article>
+
+                <article class="data-card">
+                    <div class="data-card-top">
+                        <span class="data-icon quality-icon">✦</span>
+                        <span class="data-category">SLEEP</span>
+                    </div>
+                    <p class="data-label">Sleep quality</p>
+                    <h3>{{ sleep_quality|default:"Not available" }}</h3>
+                    <p class="data-help">Your recorded sleep-quality value.</p>
+                </article>
+
+                <article class="data-card">
+                    <div class="data-card-top">
+                        <span class="data-icon stress-icon">♡</span>
+                        <span class="data-category">STRESS</span>
+                    </div>
+                    <p class="data-label">Stress score</p>
+                    <h3>{{ stress_score|default:"Not available" }}</h3>
+                    <p class="data-help">The stress score supplied to the model.</p>
+                </article>
+
+                <article class="data-card">
+                    <div class="data-card-top">
+                        <span class="data-icon journal-icon">▤</span>
+                        <span class="data-category">JOURNAL</span>
+                    </div>
+                    <p class="data-label">Journal sentiment</p>
+                    <h3>{{ journal_sentiment|default:"Not available" }}</h3>
+                    <p class="data-help">Sentiment information from your journal.</p>
+                </article>
+
+                <article class="data-card">
+                    <div class="data-card-top">
+                        <span class="data-icon face-icon">☻</span>
+                        <span class="data-category">EXPRESSION</span>
+                    </div>
+                    <p class="data-label">Facial expression</p>
+                    <h3>{{ facial_expression|default:"Not available" }}</h3>
+                    <p class="data-help">Expression value supplied to the model.</p>
+                </article>
+
+                <article class="data-card">
+                    <div class="data-card-top">
+                        <span class="data-icon heart-icon">♥</span>
+                        <span class="data-category">HEART RATE</span>
+                    </div>
+                    <p class="data-label">Recorded heart rate</p>
+                    <h3>{{ heart_rate|default:"Not available" }}{% if heart_rate != None and heart_rate != "" %} <small>BPM</small>{% endif %}</h3>
+                    <p class="data-help">The heart-rate value used by the model.</p>
+                </article>
+
+            </div>
+        </section>
+
+        <section class="reflection-panel">
+            <div class="reflection-icon">🌱</div>
+            <div>
+                <p class="eyebrow">YOUR NEXT STEP</p>
+                <h2>Turn insight into gentle self-care.</h2>
+                <p>Regardless of the predicted result, you can check in with your mood, maintain a consistent sleep routine, write down your thoughts, or try a comfortable breathing exercise.</p>
+                <div class="action-links">
+                    <a href="{% url 'mood' %}">Record your mood <span>→</span></a>
+                    <a href="{% url 'journal' %}">Open your journal <span>→</span></a>
+                    <a href="{% url 'breathing' %}">Try breathing <span>→</span></a>
+                </div>
+            </div>
+        </section>
+
+        <footer class="page-footer">
+            <span>MindCare AI</span>
+            <span>Be kind to yourself, always. ♡</span>
+        </footer>
+
+    </main>
+</div>
+>>>>>>> 3033378 (11.10.26)
 
 </body>
-
 </html>

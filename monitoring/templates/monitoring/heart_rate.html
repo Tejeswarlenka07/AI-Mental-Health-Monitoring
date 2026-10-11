@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% load static %}
 
 <!DOCTYPE html>
@@ -12,10 +13,22 @@
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
 ```
 
+=======
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Rate | MindCare AI</title>
+    <link rel="stylesheet" href="{% static 'css/heart_rate.css' %}">
+>>>>>>> 3033378 (11.10.26)
 </head>
 
 <body>
 
+<<<<<<< HEAD
 ```
 <nav class="navbar">
 
@@ -136,6 +149,230 @@
 
 </footer>
 ```
+=======
+<div class="app-layout">
+
+    <aside class="sidebar">
+        <a href="{% url 'dashboard' %}" class="brand">
+            <span class="brand-icon">✦</span>
+            <span>MindCare <small>AI WELLNESS</small></span>
+        </a>
+
+        <p class="nav-heading">YOUR WELLNESS</p>
+
+        <nav class="navigation">
+            <a href="{% url 'dashboard' %}" class="nav-link"><span>⌂</span> Dashboard</a>
+            <a href="{% url 'mood' %}" class="nav-link"><span>☻</span> Mood Tracking</a>
+            <a href="{% url 'sleep' %}" class="nav-link"><span>☾</span> Sleep Tracking</a>
+            <a href="{% url 'journal' %}" class="nav-link"><span>▤</span> My Journal</a>
+            <a href="{% url 'stress' %}" class="nav-link"><span>♡</span> Stress Tracking</a>
+            <a href="{% url 'breathing' %}" class="nav-link"><span>◎</span> Breathing</a>
+            <a href="{% url 'heart_rate' %}" class="nav-link active"><span>♡</span> Heart Rate</a>
+            <a href="{% url 'distress_prediction' %}" class="nav-link"><span>✧</span> AI Insights</a>
+        </nav>
+
+        <div class="sidebar-note">
+            <div class="note-icon">🌿</div>
+            <h3>Listen to your body</h3>
+            <p>Make time to check in with yourself and record your wellness observations.</p>
+        </div>
+
+        <a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">YOUR BODY · YOUR WELLNESS</p>
+                <h1>Heart Rate Monitor <span>♡</span></h1>
+            </div>
+            <div class="date-chip">✦ &nbsp; Wellness check-in</div>
+        </header>
+
+        <section class="welcome-banner">
+            <div class="welcome-text">
+                <span class="banner-label">NOTICE · RECORD · REFLECT</span>
+                <h2>Stay connected with your body's rhythm.</h2>
+                <p>Record your heart rate to keep track of your wellness observations over time. Enter a reading from a reliable measurement device or a method you trust.</p>
+                <div class="banner-meta">
+                    <span>♡ &nbsp; Manual BPM entry</span>
+                    <span>▤ &nbsp; Personal history</span>
+                </div>
+            </div>
+            <div class="banner-decoration" aria-hidden="true">
+                <div class="pulse-orbit">
+                    <span>♡</span>
+                </div>
+                <span class="pulse-star star-one">✦</span>
+                <span class="pulse-star star-two">✧</span>
+            </div>
+        </section>
+
+        <section class="monitor-grid">
+
+            <div class="entry-card">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">NEW MEASUREMENT</p>
+                        <h2>Record your heart rate</h2>
+                    </div>
+                    <span class="heading-icon">♡</span>
+                </div>
+
+                <p class="card-description">Enter your measured heart rate in beats per minute (BPM).</p>
+
+                <form method="POST" class="heart-form" id="heartForm">
+                    {% csrf_token %}
+
+                    <label for="heart_rate">Heart rate (BPM)</label>
+
+                    <div class="bpm-input-wrap">
+                        <input
+                            type="number"
+                            id="heart_rate"
+                            name="heart_rate"
+                            min="30"
+                            max="220"
+                            placeholder="e.g. 72"
+                            required
+                        >
+                        <span>BPM</span>
+                    </div>
+
+                    <div class="input-hint">
+                        <span>ⓘ</span>
+                        <p>Enter a value between 30 and 220 BPM, as accepted by this form.</p>
+                    </div>
+
+                    <div class="bpm-preview" id="bpmPreview">
+                        <div class="preview-icon">♡</div>
+                        <div>
+                            <span>YOUR ENTRY</span>
+                            <strong id="previewValue">— BPM</strong>
+                            <small id="previewMessage">Your entered value will appear here.</small>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="save-button">
+                        Save Heart Rate <span>→</span>
+                    </button>
+                </form>
+            </div>
+
+            <aside class="info-column">
+                <div class="info-card">
+                    <div class="info-icon">♥</div>
+                    <p class="eyebrow">UNDERSTAND BPM</p>
+                    <h3>What is heart rate?</h3>
+                    <p>Heart rate is the number of times your heart beats per minute. It can change with activity, emotions, medication, and other factors.</p>
+                </div>
+
+                <div class="info-card info-card-lavender">
+                    <div class="info-icon">✦</div>
+                    <p class="eyebrow">A HELPFUL TIP</p>
+                    <h3>Measure consistently</h3>
+                    <p>If you're tracking resting heart rate, try measuring under similar resting conditions each time and note anything that may affect the reading.</p>
+                </div>
+            </aside>
+
+        </section>
+
+        <section class="history-section">
+            <div class="history-header">
+                <div>
+                    <p class="eyebrow">YOUR WELLNESS JOURNEY</p>
+                    <h2>Heart rate history</h2>
+                    <p>Review your previously saved measurements.</p>
+                </div>
+                <span class="history-icon">▤</span>
+            </div>
+
+            {% if heart_rates %}
+                <div class="history-summary">
+                    <div>
+                        <span class="summary-label">SAVED READINGS</span>
+                        <strong>{{ heart_rates|length }}</strong>
+                    </div>
+                    <p>Your recorded measurements are listed below, newest or oldest according to your existing Django view ordering.</p>
+                </div>
+
+                <div class="table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Measurement</th>
+                                <th>Heart Rate</th>
+                                <th>Date and Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in heart_rates %}
+                            <tr>
+                                <td>
+                                    <div class="measurement-cell">
+                                        <span class="table-heart">♡</span>
+                                        <span>Heart rate entry</span>
+                                    </div>
+                                </td>
+                                <td><strong class="bpm-value">{{ entry.heart_rate }} <small>BPM</small></strong></td>
+                                <td class="date-value">{{ entry.created_at|date:"d M Y, h:i A" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">♡</div>
+                    <h3>No heart-rate records yet</h3>
+                    <p>Your saved measurements will appear here. Enter your first reading above whenever you're ready.</p>
+                </div>
+            {% endif %}
+        </section>
+
+        <div class="health-note">
+            <span>ⓘ</span>
+            <p><strong>Please remember:</strong> This page stores manually entered readings and is not a medical monitoring device. A single reading cannot diagnose a condition. If you have symptoms such as chest pain, fainting, or severe shortness of breath, seek urgent medical attention.</p>
+        </div>
+
+        <footer class="page-footer">
+            <span>MindCare AI</span>
+            <span>Be kind to yourself, always. ♡</span>
+        </footer>
+
+    </main>
+</div>
+
+<script>
+    const heartInput = document.getElementById("heart_rate");
+    const previewValue = document.getElementById("previewValue");
+    const previewMessage = document.getElementById("previewMessage");
+    const previewCard = document.getElementById("bpmPreview");
+
+    heartInput.addEventListener("input", function () {
+        const value = Number(heartInput.value);
+
+        if (heartInput.value.trim() === "") {
+            previewValue.textContent = "— BPM";
+            previewMessage.textContent = "Your entered value will appear here.";
+            previewCard.classList.remove("has-value", "invalid-value");
+            return;
+        }
+
+        previewValue.textContent = heartInput.value + " BPM";
+        previewCard.classList.add("has-value");
+
+        if (!Number.isInteger(value) || value < 30 || value > 220) {
+            previewMessage.textContent = "Enter a whole number from 30 to 220.";
+            previewCard.classList.add("invalid-value");
+        } else {
+            previewMessage.textContent = "Reading entered. Save when ready.";
+            previewCard.classList.remove("invalid-value");
+        }
+    });
+</script>
+>>>>>>> 3033378 (11.10.26)
 
 </body>
 

@@ -11,15 +11,12 @@ def home(request):
 
 
 def register_view(request):
-
     if request.method == 'POST':
-
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
 
         if User.objects.filter(username=username).exists():
-
             return render(
                 request,
                 'users/register.html',
@@ -42,9 +39,7 @@ def register_view(request):
 
 
 def login_view(request):
-
     if request.method == 'POST':
-
         username = request.POST.get('username')
         password = request.POST.get('password')
 
@@ -55,9 +50,7 @@ def login_view(request):
         )
 
         if user is not None:
-
             login(request, user)
-
             return redirect('dashboard')
 
         return render(
@@ -72,27 +65,22 @@ def login_view(request):
 
 
 def logout_view(request):
-
     logout(request)
-
     return redirect('home')
 
 
 @login_required
 def profile_view(request):
-
     profile, created = UserProfile.objects.get_or_create(
         user=request.user
     )
 
     if request.method == 'POST':
-
         age = request.POST.get('age')
         bio = request.POST.get('bio')
 
         profile.age = age
         profile.bio = bio
-
         profile.save()
 
         return redirect('profile')

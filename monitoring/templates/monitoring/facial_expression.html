@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% load static %}
 
 <!DOCTYPE html>
@@ -828,4 +829,148 @@ loadAIModel();
 
 </body>
 
+=======
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facial Expression Detection | MindCare AI</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f7f4;
+            color: #26382e;
+        }
+
+        header {
+            background: #648b75;
+            color: white;
+            padding: 22px;
+            text-align: center;
+        }
+
+        main {
+            max-width: 850px;
+            margin: 35px auto;
+            padding: 25px;
+            text-align: center;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px #00000010;
+        }
+
+        video {
+            display: block;
+            width: 100%;
+            max-width: 600px;
+            min-height: 200px;
+            margin: 20px auto;
+            background: #202820;
+            border-radius: 12px;
+        }
+
+        button, .back-link {
+            display: inline-block;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin: 6px;
+            background: #648b75;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        button:hover, .back-link:hover {
+            background: #496c58;
+        }
+
+        #status {
+            margin: 18px 0;
+            color: #52685a;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Facial Expression Detection</h1>
+        <p>MindCare AI — Mental Wellness Monitoring</p>
+    </header>
+
+    <main>
+        <h2>Camera Preview</h2>
+        <p>
+            Start your camera to preview the video.
+            Camera preview alone does not detect emotions.
+        </p>
+
+        <video id="camera" autoplay playsinline muted></video>
+
+        <button id="startCamera" type="button">Start Camera</button>
+        <button id="stopCamera" type="button">Stop Camera</button>
+
+        <p id="status" role="status">
+            Camera is stopped.
+        </p>
+
+        <a class="back-link" href="{% url 'dashboard' %}">
+            Back to Dashboard
+        </a>
+    </main>
+
+    <script>
+        const video = document.getElementById("camera");
+        const statusText = document.getElementById("status");
+        let cameraStream = null;
+
+        document.getElementById("startCamera").addEventListener("click", async () => {
+            try {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    statusText.textContent =
+                        "Camera access is not supported by this browser.";
+                    return;
+                }
+
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: false
+                });
+
+                video.srcObject = cameraStream;
+                statusText.textContent =
+                    "Camera is running. Expression detection is not enabled yet.";
+            } catch (error) {
+                statusText.textContent =
+                    "Unable to access the camera. Check browser permissions.";
+                console.error(error);
+            }
+        });
+
+        document.getElementById("stopCamera").addEventListener("click", () => {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+
+            video.srcObject = null;
+            statusText.textContent = "Camera is stopped.";
+        });
+
+        window.addEventListener("beforeunload", () => {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+            }
+        });
+    </script>
+</body>
+>>>>>>> 3033378 (11.10.26)
 </html>

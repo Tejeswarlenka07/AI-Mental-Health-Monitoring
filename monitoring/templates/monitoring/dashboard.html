@@ -1,16 +1,27 @@
 {% load static %}
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3033378 (11.10.26)
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 <head>
+<<<<<<< HEAD
     <title>Dashboard - MindCare AI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+=======
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | MindCare AI</title>
+
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+>>>>>>> 3033378 (11.10.26)
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
+<<<<<<< HEAD
 
 <div class="navbar">
     <h2>MindCare AI</h2>
@@ -312,9 +323,396 @@
 <script>
     const chartTextColor = '#94a3b8';
     const chartGridColor = 'rgba(148, 163, 184, 0.08)';
+=======
 
-    const wellnessChart = document.getElementById('wellnessChart');
+<div class="app-layout">
 
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="{% url 'dashboard' %}" class="brand">
+            <span class="brand-icon">✿</span>
+            <span>MindCare<span class="brand-ai"> AI</span></span>
+        </a>
+
+        <p class="nav-heading">WORKSPACE</p>
+
+        <nav class="navigation">
+            <a href="{% url 'dashboard' %}" class="nav-link active">
+                <span>▦</span> Dashboard
+            </a>
+            <a href="{% url 'mood' %}" class="nav-link">
+                <span>☻</span> Mood Tracker
+            </a>
+            <a href="{% url 'sleep' %}" class="nav-link">
+                <span>☾</span> Sleep Tracker
+            </a>
+            <a href="{% url 'journal' %}" class="nav-link">
+                <span>▤</span> My Journal
+            </a>
+            <a href="{% url 'stress' %}" class="nav-link">
+                <span>♡</span> Stress Assessment
+            </a>
+            <a href="{% url 'breathing' %}" class="nav-link">
+                <span>◉</span> Breathing Exercise
+            </a>
+            <a href="{% url 'distress_prediction' %}" class="nav-link">
+                <span>✧</span> AI Insights
+            </a>
+            <a href="{% url 'heart_rate' %}" class="nav-link">
+                <span>♡</span> Heart Rate
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="support-card">
+                <span class="support-icon">☘</span>
+                <h3>Take a deep breath</h3>
+                <p>A small pause can make a difference.</p>
+                <a href="{% url 'breathing' %}">Start breathing →</a>
+            </div>
+
+            <a href="{% url 'profile' %}" class="nav-link">
+                <span>⚙</span> My Profile
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">YOUR PERSONAL WELLNESS SPACE</p>
+                <h1>Good to see you, {{ request.user.username }} <span>✦</span></h1>
+                <p class="subtitle">Take a moment to check in with yourself today.</p>
+            </div>
+
+            <a href="{% url 'profile' %}" class="profile-chip">
+                <span class="avatar">
+                    {{ request.user.username|first|upper }}
+                </span>
+                <span>{{ request.user.username }}</span>
+            </a>
+        </header>
+
+        <!-- Welcome banner -->
+        <section class="welcome-banner">
+            <div class="welcome-copy">
+                <span class="banner-label">A GENTLE REMINDER</span>
+                <h2>Your well-being matters.</h2>
+                <p>Every small step you take toward understanding yourself counts.</p>
+                <a href="{% url 'journal' %}" class="primary-button">
+                    Write in your journal <span>→</span>
+                </a>
+            </div>
+            <div class="banner-art" aria-hidden="true">
+                <span class="art-circle circle-one"></span>
+                <span class="art-circle circle-two"></span>
+                <span class="art-leaf">✿</span>
+            </div>
+        </section>
+
+        <!-- Summary cards -->
+        <section class="section-block">
+            <div class="section-heading">
+                <div>
+                    <h2>Your wellness overview</h2>
+                    <p>A snapshot of the information you've recorded.</p>
+                </div>
+            </div>
+
+            <div class="summary-grid">
+                <article class="summary-card wellness-card">
+                    <div class="card-top">
+                        <span class="metric-icon green-icon">✿</span>
+                        <span class="metric-label">WELLNESS SCORE</span>
+                    </div>
+                    <div class="metric-value">
+                        {{ wellness_score }}<span>/100</span>
+                    </div>
+                    <p class="metric-note">{{ wellness_status }}</p>
+                    <div class="progress-track">
+                        <div class="progress-fill"
+                             style="width: {% if wellness_score > 100 %}100{% elif wellness_score < 0 %}0{% else %}{{ wellness_score }}{% endif %}%">
+                        </div>
+                    </div>
+                </article>
+
+                <article class="summary-card">
+                    <div class="card-top">
+                        <span class="metric-icon purple-icon">✧</span>
+                        <span class="metric-label">AI WELLNESS INSIGHT</span>
+                    </div>
+                    <h3 class="prediction-value">{{ dashboard_distress_level }}</h3>
+                    <p class="metric-note">Experimental estimate from available data.</p>
+                    <a class="text-link" href="{% url 'distress_prediction' %}">
+                        Explore insights →
+                    </a>
+                </article>
+
+                <article class="summary-card">
+                    <div class="card-top">
+                        <span class="metric-icon peach-icon">☾</span>
+                        <span class="metric-label">LATEST SLEEP</span>
+                    </div>
+                    {% if sleeps %}
+                        <div class="metric-value">
+                            {{ sleeps.0.hours }}<span> hrs</span>
+                        </div>
+                        <p class="metric-note">Quality: {{ sleeps.0.quality }}</p>
+                    {% else %}
+                        <h3 class="empty-value">Not recorded yet</h3>
+                        <p class="metric-note">Add your latest sleep entry.</p>
+                    {% endif %}
+                    <a class="text-link" href="{% url 'sleep' %}">Log sleep →</a>
+                </article>
+
+                <article class="summary-card">
+                    <div class="card-top">
+                        <span class="metric-icon blue-icon">♡</span>
+                        <span class="metric-label">LATEST MOOD</span>
+                    </div>
+                    {% if moods %}
+                        <h3 class="prediction-value">
+                            {{ moods.0.get_mood_display|default:moods.0.mood }}
+                        </h3>
+                        <p class="metric-note">Your latest mood entry.</p>
+                    {% else %}
+                        <h3 class="empty-value">Not recorded yet</h3>
+                        <p class="metric-note">How are you feeling today?</p>
+                    {% endif %}
+                    <a class="text-link" href="{% url 'mood' %}">Record mood →</a>
+                </article>
+            </div>
+        </section>
+
+        <!-- Quick actions -->
+        <section class="section-block">
+            <div class="section-heading">
+                <div>
+                    <h2>Your daily check-in</h2>
+                    <p>Choose one small action for yourself.</p>
+                </div>
+            </div>
+
+            <div class="actions-grid">
+                <a href="{% url 'mood' %}" class="action-card">
+                    <span class="action-icon action-green">☻</span>
+                    <span class="action-text">
+                        <strong>Track mood</strong>
+                        <small>Check in with your feelings</small>
+                    </span>
+                    <span class="action-arrow">→</span>
+                </a>
+
+                <a href="{% url 'sleep' %}" class="action-card">
+                    <span class="action-icon action-purple">☾</span>
+                    <span class="action-text">
+                        <strong>Log your sleep</strong>
+                        <small>Review your rest</small>
+                    </span>
+                    <span class="action-arrow">→</span>
+                </a>
+
+                <a href="{% url 'stress' %}" class="action-card">
+                    <span class="action-icon action-peach">♡</span>
+                    <span class="action-text">
+                        <strong>Assess stress</strong>
+                        <small>Reflect on how you feel</small>
+                    </span>
+                    <span class="action-arrow">→</span>
+                </a>
+
+                <a href="{% url 'journal' %}" class="action-card">
+                    <span class="action-icon action-blue">✎</span>
+                    <span class="action-text">
+                        <strong>Write a journal</strong>
+                        <small>Put your thoughts into words</small>
+                    </span>
+                    <span class="action-arrow">→</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Charts -->
+        <section class="section-block">
+            <div class="section-heading">
+                <div>
+                    <h2>Your wellness patterns</h2>
+                    <p>Explore the records you've entered over time.</p>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <article class="chart-card chart-wide">
+                    <div class="chart-heading">
+                        <div>
+                            <h3>Wellness score</h3>
+                            <p>Your current overall score</p>
+                        </div>
+                        <span class="chart-tag">Overview</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="wellnessChart"></canvas>
+                    </div>
+                </article>
+
+                <article class="chart-card">
+                    <div class="chart-heading">
+                        <div>
+                            <h3>Sleep history</h3>
+                            <p>Hours recorded</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="sleepChart"></canvas>
+                    </div>
+                </article>
+
+                <article class="chart-card">
+                    <div class="chart-heading">
+                        <div>
+                            <h3>Stress history</h3>
+                            <p>Recorded assessment scores</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="stressChart"></canvas>
+                    </div>
+                </article>
+
+                <article class="chart-card chart-wide">
+                    <div class="chart-heading">
+                        <div>
+                            <h3>Mood history</h3>
+                            <p>Recorded mood entries, from lower to higher mood categories</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="moodChart"></canvas>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Latest records -->
+        <section class="section-block">
+            <div class="section-heading">
+                <div>
+                    <h2>Your latest activity</h2>
+                    <p>Your most recent wellness records.</p>
+                </div>
+            </div>
+
+            <div class="activity-grid">
+                <article class="activity-card">
+                    <span class="activity-icon action-green">☻</span>
+                    <div>
+                        <h3>Mood</h3>
+                        {% if moods %}
+                            <p>{{ moods.0.get_mood_display|default:moods.0.mood }}</p>
+                        {% else %}
+                            <p>No mood recorded yet.</p>
+                        {% endif %}
+                        <a href="{% url 'mood' %}">Update mood →</a>
+                    </div>
+                </article>
+
+                <article class="activity-card">
+                    <span class="activity-icon action-purple">☾</span>
+                    <div>
+                        <h3>Sleep</h3>
+                        {% if sleeps %}
+                            <p>{{ sleeps.0.hours }} hours · {{ sleeps.0.quality }}</p>
+                        {% else %}
+                            <p>No sleep recorded yet.</p>
+                        {% endif %}
+                        <a href="{% url 'sleep' %}">Update sleep →</a>
+                    </div>
+                </article>
+
+                <article class="activity-card">
+                    <span class="activity-icon action-blue">✎</span>
+                    <div>
+                        <h3>Journal</h3>
+                        {% if journals %}
+                            <p>{{ journals.0.sentiment|default:"Entry recorded" }}</p>
+                        {% else %}
+                            <p>No journal entry yet.</p>
+                        {% endif %}
+                        <a href="{% url 'journal' %}">Open journal →</a>
+                    </div>
+                </article>
+
+                <article class="activity-card">
+                    <span class="activity-icon action-peach">♡</span>
+                    <div>
+                        <h3>Stress assessment</h3>
+                        {% if stresses %}
+                            <p>Score: {{ stresses.0.score }} · {{ stresses.0.level }}</p>
+                        {% else %}
+                            <p>No assessment yet.</p>
+                        {% endif %}
+                        <a href="{% url 'stress' %}">Take assessment →</a>
+                    </div>
+                </article>
+
+                <article class="activity-card">
+                    <span class="activity-icon action-green">◉</span>
+                    <div>
+                        <h3>Breathing</h3>
+                        <p>Sessions completed: {{ breathings|length }}</p>
+                        <a href="{% url 'breathing' %}">Start exercise →</a>
+                    </div>
+                </article>
+
+                <article class="activity-card">
+                    <span class="activity-icon action-purple">♡</span>
+                    <div>
+                        <h3>Heart rate</h3>
+                        {% if heart_rates %}
+                            <p>{{ heart_rates.0.heart_rate }} BPM · Latest reading</p>
+                        {% else %}
+                            <p>No reading recorded yet.</p>
+                        {% endif %}
+                        <a href="{% url 'heart_rate' %}">View heart rate →</a>
+                    </div>
+                </article>
+
+                <article class="activity-card">
+                    <span class="activity-icon action-blue">◎</span>
+                    <div>
+                        <h3>Facial expression</h3>
+                        {% if facial_expressions %}
+                            <p>{{ facial_expressions.0.expression }}</p>
+                        {% else %}
+                            <p>No expression recorded yet.</p>
+                        {% endif %}
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <footer class="page-footer">
+            <p>MindCare AI · Your wellness journey, one step at a time.</p>
+            <p>For wellness support only. AI estimates are not medical diagnoses.</p>
+        </footer>
+
+    </main>
+</div>
+
+<script>
+    // Convert Django data into JavaScript-safe arrays using json_script.
+    const wellnessValue = Number("{{ wellness_score|default:0 }}") || 0;
+>>>>>>> 3033378 (11.10.26)
+
+    const sleepLabels = [
+        {% for sleep in sleeps reversed %}
+            "{{ sleep.created_at|date:'d M'|escapejs }}",
+        {% endfor %}
+    ];
+
+<<<<<<< HEAD
     new Chart(wellnessChart, {
         type: 'doughnut',
         data: {
@@ -340,21 +738,96 @@
                         color: chartTextColor
                     }
                 }
+=======
+    const sleepValues = [
+        {% for sleep in sleeps reversed %}
+            Number("{{ sleep.hours|default:0 }}") || 0,
+        {% endfor %}
+    ];
+
+    const stressLabels = [
+        {% for stress in stresses reversed %}
+            "{{ stress.created_at|date:'d M'|escapejs }}",
+        {% endfor %}
+    ];
+
+    const stressValues = [
+        {% for stress in stresses reversed %}
+            Number("{{ stress.score|default:0 }}") || 0,
+        {% endfor %}
+    ];
+
+    const moodLabels = [
+        {% for mood in moods reversed %}
+            "{{ mood.created_at|date:'d M'|escapejs }}",
+        {% endfor %}
+    ];
+
+    const moodValues = [
+        {% for mood in moods reversed %}
+            {% if mood.mood == 'very_sad' %}1
+            {% elif mood.mood == 'sad' %}2
+            {% elif mood.mood == 'okay' %}3
+            {% elif mood.mood == 'good' %}4
+            {% else %}5
+            {% endif %},
+        {% endfor %}
+    ];
+
+    Chart.defaults.font.family = "Inter, Segoe UI, sans-serif";
+    Chart.defaults.color = "#7b827d";
+
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            x: {
+                grid: { display: false },
+                border: { display: false }
+            },
+            y: {
+                beginAtZero: true,
+                grid: { color: "#edf0eb" },
+                border: { display: false }
+            }
+        }
+    };
+
+    new Chart(document.getElementById("wellnessChart"), {
+        type: "line",
+        data: {
+            labels: ["Current"],
+            datasets: [{
+                label: "Wellness score",
+                data: [wellnessValue],
+                borderColor: "#668b72",
+                backgroundColor: "rgba(102, 139, 114, 0.13)",
+                fill: true,
+                tension: 0.4,
+                pointRadius: 5
+            }]
+        },
+        options: {
+            ...commonOptions,
+            scales: {
+                ...commonOptions.scales,
+                y: { ...commonOptions.scales.y, min: 0, max: 100 }
+>>>>>>> 3033378 (11.10.26)
             }
         }
     });
 
-    const sleepChart = document.getElementById('sleepChart');
-
-    new Chart(sleepChart, {
-        type: 'bar',
+    new Chart(document.getElementById("sleepChart"), {
+        type: "bar",
         data: {
-            labels: [
-                {% for sleep in sleeps %}
-                    '{{ sleep.created_at|date:"d M" }}',
-                {% endfor %}
-            ],
+            labels: sleepLabels,
             datasets: [{
+<<<<<<< HEAD
                 label: 'Sleep Hours',
                 data: [
                     {% for sleep in sleeps %}
@@ -393,19 +866,24 @@
                 }
             }
         }
+=======
+                label: "Sleep hours",
+                data: sleepValues,
+                backgroundColor: "#b9a9df",
+                borderRadius: 6,
+                maxBarThickness: 34
+            }]
+        },
+        options: commonOptions
+>>>>>>> 3033378 (11.10.26)
     });
 
-    const stressChart = document.getElementById('stressChart');
-
-    new Chart(stressChart, {
-        type: 'line',
+    new Chart(document.getElementById("stressChart"), {
+        type: "line",
         data: {
-            labels: [
-                {% for stress in stresses %}
-                    '{{ stress.created_at|date:"d M" }}',
-                {% endfor %}
-            ],
+            labels: stressLabels,
             datasets: [{
+<<<<<<< HEAD
                 label: 'Stress Score',
                 data: [
                     {% for stress in stresses %}
@@ -447,19 +925,26 @@
                 }
             }
         }
+=======
+                label: "Stress score",
+                data: stressValues,
+                borderColor: "#d99579",
+                backgroundColor: "rgba(217, 149, 121, 0.12)",
+                fill: true,
+                tension: 0.35,
+                pointRadius: 4
+            }]
+        },
+        options: commonOptions
+>>>>>>> 3033378 (11.10.26)
     });
 
-    const moodChart = document.getElementById('moodChart');
-
-    new Chart(moodChart, {
-        type: 'line',
+    new Chart(document.getElementById("moodChart"), {
+        type: "line",
         data: {
-            labels: [
-                {% for mood in moods %}
-                    '{{ mood.created_at|date:"d M" }}',
-                {% endfor %}
-            ],
+            labels: moodLabels,
             datasets: [{
+<<<<<<< HEAD
                 label: 'Mood',
                 data: [
                     {% for mood in moods %}
@@ -510,6 +995,36 @@
                 legend: {
                     labels: {
                         color: chartTextColor
+=======
+                label: "Mood category",
+                data: moodValues,
+                borderColor: "#7399bd",
+                backgroundColor: "rgba(115, 153, 189, 0.12)",
+                fill: true,
+                tension: 0.35,
+                pointRadius: 4
+            }]
+        },
+        options: {
+            ...commonOptions,
+            scales: {
+                ...commonOptions.scales,
+                y: {
+                    ...commonOptions.scales.y,
+                    min: 1,
+                    max: 5,
+                    ticks: {
+                        stepSize: 1,
+                        callback: function(value) {
+                            return ({
+                                1: "Very sad",
+                                2: "Sad",
+                                3: "Okay",
+                                4: "Good",
+                                5: "Very good"
+                            })[value] || value;
+                        }
+>>>>>>> 3033378 (11.10.26)
                     }
                 }
             }
@@ -518,4 +1033,8 @@
 </script>
 
 </body>
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> 3033378 (11.10.26)

@@ -1,97 +1,223 @@
+
+{% load static %}
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>Sleep Tracking - MindCare AI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleep Tracker | MindCare AI</title>
+    <link rel="stylesheet" href="{% static 'css/sleep.css' %}">
 </head>
-
 <body>
+<div class="page-layout">
 
-    <h1>Sleep Tracking</h1>
+    <aside class="sidebar">
+        <a href="{% url 'dashboard' %}" class="brand">
+            <span class="brand-icon">✿</span>
+            <span>MindCare <span class="brand-ai">AI</span></span>
+        </a>
 
-    <p>Track your sleep to understand your wellness patterns.</p>
+        <p class="nav-heading">WORKSPACE</p>
 
-    <form method="POST">
+        <nav class="navigation">
+            <a href="{% url 'dashboard' %}" class="nav-link">▦ &nbsp; Dashboard</a>
+            <a href="{% url 'mood' %}" class="nav-link">☻ &nbsp; Mood Tracker</a>
+            <a href="{% url 'sleep' %}" class="nav-link active">☾ &nbsp; Sleep Tracker</a>
+            <a href="{% url 'journal' %}" class="nav-link">▤ &nbsp; My Journal</a>
+            <a href="{% url 'stress' %}" class="nav-link">♡ &nbsp; Stress Assessment</a>
+            <a href="{% url 'breathing' %}" class="nav-link">◉ &nbsp; Breathing Exercise</a>
+            <a href="{% url 'distress_prediction' %}" class="nav-link">✧ &nbsp; AI Insights</a>
+            <a href="{% url 'heart_rate' %}" class="nav-link">♡ &nbsp; Heart Rate</a>
+        </nav>
 
-        {% csrf_token %}
-
-        <label>How many hours did you sleep?</label>
-
-        <br>
-
-        <input
-            type="number"
-            name="hours"
-            step="0.5"
-            min="0"
-            max="24"
-            required
-        >
-
-        <br><br>
-
-        <label>Sleep Quality</label>
-
-        <br>
-
-        <select name="quality" required>
-
-            <option value="">-- Select Quality --</option>
-
-            <option value="1">1 - Very Poor</option>
-            <option value="2">2 - Poor</option>
-            <option value="3">3 - Average</option>
-            <option value="4">4 - Good</option>
-            <option value="5">5 - Excellent</option>
-
-        </select>
-
-        <br><br>
-
-        <button type="submit">
-            Save Sleep
-        </button>
-
-    </form>
-
-    <hr>
-
-    <h2>Previous Sleep Records</h2>
-
-    {% for entry in sleeps %}
-
-        <div>
-
-            <p>
-                <strong>
-                    {{ entry.hours }} hours
-                </strong>
-            </p>
-
-            <p>
-                Sleep Quality: {{ entry.quality }}/5
-            </p>
-
-            <small>
-                {{ entry.created_at }}
-            </small>
-
+        <div class="sidebar-bottom">
+            <a href="{% url 'profile' %}" class="nav-link">⚙ &nbsp; My Profile</a>
         </div>
+    </aside>
 
-        <hr>
+    <main class="main-content">
 
-    {% empty %}
+        <header class="page-header">
+            <div>
+                <p class="eyebrow">REST • RECOVER • RESET</p>
+                <h1>Your sleep, your well-being.</h1>
+                <p class="subtitle">
+                    Track your rest and build a clearer picture of your sleep patterns.
+                </p>
+            </div>
+            <a href="{% url 'dashboard' %}" class="back-button">← Dashboard</a>
+        </header>
 
-        <p>No sleep records yet.</p>
+        <section class="sleep-banner">
+            <div class="banner-copy">
+                <span class="banner-label">TIME TO UNWIND</span>
+                <h2>Give yourself permission to rest.</h2>
+                <p>
+                    Your sleep record is a simple way to reflect on how much rest
+                    you're getting and how refreshed you feel.
+                </p>
+            </div>
+            <div class="sleep-art" aria-hidden="true">
+                <span>☾</span>
+                <i>✦</i>
+                <b>✧</b>
+            </div>
+        </section>
 
-    {% endfor %}
+        <section class="sleep-summary">
+            <article class="summary-card">
+                <span class="summary-icon">☾</span>
+                <div>
+                    <p class="summary-label">LATEST SLEEP</p>
+                    {% if sleeps %}
+                        <h3>{{ sleeps.0.hours }} <small>hours</small></h3>
+                        <p class="summary-note">Your most recent record</p>
+                    {% else %}
+                        <h3>— <small>hours</small></h3>
+                        <p class="summary-note">No sleep recorded yet</p>
+                    {% endif %}
+                </div>
+            </article>
 
-    <br>
+            <article class="summary-card">
+                <span class="summary-icon quality-icon">✧</span>
+                <div>
+                    <p class="summary-label">SLEEP QUALITY</p>
+                    {% if sleeps %}
+                        <h3>{{ sleeps.0.quality }}<small>/5</small></h3>
+                        <p class="summary-note">Latest quality rating</p>
+                    {% else %}
+                        <h3>—<small>/5</small></h3>
+                        <p class="summary-note">Rate your sleep below</p>
+                    {% endif %}
+                </div>
+            </article>
 
-    <a href="{% url 'dashboard' %}">
-        Back to Dashboard
-    </a>
+            <article class="summary-card">
+                <span class="summary-icon record-icon">▤</span>
+                <div>
+                    <p class="summary-label">TOTAL RECORDS</p>
+                    <h3>{{ sleeps|length }}</h3>
+                    <p class="summary-note">Saved sleep entries</p>
+                </div>
+            </article>
+        </section>
 
+        <section class="form-card">
+            <div class="section-title">
+                <span class="step-number">01</span>
+                <div>
+                    <h2>Record your sleep</h2>
+                    <p>Enter details about your most recent sleep.</p>
+                </div>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="form-grid">
+                    <div class="field-group">
+                        <label for="hours">How long did you sleep?</label>
+                        <p class="field-help">Enter the total hours you slept.</p>
+                        <div class="input-with-unit">
+                            <input
+                                id="hours"
+                                type="number"
+                                name="hours"
+                                step="0.5"
+                                min="0"
+                                max="24"
+                                placeholder="e.g. 7.5"
+                                required
+                            >
+                            <span>hours</span>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="quality">How was your sleep quality?</label>
+                        <p class="field-help">Choose the rating that best describes your rest.</p>
+                        <select id="quality" name="quality" required>
+                            <option value="">Choose sleep quality</option>
+                            <option value="1">1 — Very Poor</option>
+                            <option value="2">2 — Poor</option>
+                            <option value="3">3 — Average</option>
+                            <option value="4">4 — Good</option>
+                            <option value="5">5 — Excellent</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="quality-guide">
+                    <span>1 · Very poor</span>
+                    <span>2 · Poor</span>
+                    <span>3 · Average</span>
+                    <span>4 · Good</span>
+                    <span>5 · Excellent</span>
+                </div>
+
+                <div class="form-footer">
+                    <p>♡ Every entry helps you reflect on your habits.</p>
+                    <button type="submit" class="save-button">
+                        Save sleep record <span>→</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="history-section">
+            <div class="history-heading">
+                <div>
+                    <p class="eyebrow">YOUR SLEEP JOURNEY</p>
+                    <h2>Previous sleep records</h2>
+                    <p class="subtitle">Review the entries you've saved.</p>
+                </div>
+                <span class="entry-count">{{ sleeps|length }} records</span>
+            </div>
+
+            <div class="history-list">
+                {% for entry in sleeps %}
+                    <article class="history-card">
+                        <div class="history-icon">☾</div>
+                        <div class="history-content">
+                            <h3>{{ entry.hours }} hours of sleep</h3>
+                            <p class="quality-text">
+                                Sleep quality: <strong>{{ entry.quality }}/5</strong>
+                            </p>
+                            <span class="entry-date">
+                                {{ entry.created_at|date:"d M Y, g:i A" }}
+                            </span>
+                        </div>
+
+                        <div class="quality-badge">
+                            {% if entry.quality == 5 %}
+                                Excellent
+                            {% elif entry.quality == 4 %}
+                                Good
+                            {% elif entry.quality == 3 %}
+                                Average
+                            {% elif entry.quality == 2 %}
+                                Poor
+                            {% else %}
+                                Very poor
+                            {% endif %}
+                        </div>
+                    </article>
+                {% empty %}
+                    <div class="empty-state">
+                        <span>☾</span>
+                        <h3>Your sleep journey starts here</h3>
+                        <p>Save your first sleep record to see it listed here.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <footer class="page-footer">
+            MindCare AI · Rest is part of taking care of yourself.
+        </footer>
+
+    </main>
+</div>
 </body>
-
 </html>

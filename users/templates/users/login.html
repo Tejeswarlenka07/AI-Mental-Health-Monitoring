@@ -1,39 +1,136 @@
+```html
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Login - MindCare AI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | MindCare AI</title>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
 </head>
 
 <body>
+    <main class="login-page">
 
-    <h1>Login</h1>
+        <section class="login-visual">
+            <div class="visual-brand">
+                <span class="brand-icon">✦</span>
+                <span>MindCare <strong>AI</strong></span>
+            </div>
 
-    {% if error %}
-        <p>{{ error }}</p>
-    {% endif %}
+            <div class="visual-content">
+                <div class="leaf-icon">🌿</div>
+                <p class="eyebrow">YOUR PERSONAL WELLNESS SPACE</p>
+                <h1>A healthier mind starts with you.</h1>
+                <p class="visual-description">
+                    Understand your emotions, build healthier habits,
+                    and make time for your mental wellbeing every day.
+                </p>
 
-    <form method="POST">
+                <div class="visual-note">
+                    <span class="quote-mark">“</span>
+                    <p>Small steps every day can make a meaningful difference.</p>
+                </div>
+            </div>
 
-        {% csrf_token %}
+            <p class="visual-footer">MindCare AI · Your wellbeing matters.</p>
+        </section>
 
-        <label>Username</label>
-        <input type="text" name="username" required>
+        <section class="login-section">
+            <div class="login-card">
 
-        <br><br>
+                <div class="mobile-brand">
+                    <span class="brand-icon">✦</span>
+                    <span>MindCare <strong>AI</strong></span>
+                </div>
 
-        <label>Password</label>
-        <input type="password" name="password" required>
+                <div class="form-heading">
+                    <span class="welcome-tag">WELCOME BACK</span>
+                    <h2>Sign in to your account</h2>
+                    <p>Continue your personal wellness journey.</p>
+                </div>
 
-        <br><br>
+                {% if error %}
+                    <div class="error-message" role="alert">
+                        <span>⚠</span> {{ error }}
+                    </div>
+                {% endif %}
 
-        <button type="submit">Login</button>
+                <form method="POST" class="login-form">
+                    {% csrf_token %}
 
-    </form>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            placeholder="Enter your username"
+                            autocomplete="username"
+                            required
+                            autofocus
+                        >
+                    </div>
 
-    <p>
-        Don't have an account?
-        <a href="{% url 'register' %}">Register</a>
-    </p>
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label for="password">Password</label>
+                        </div>
 
+                        <div class="password-wrapper">
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Enter your password"
+                                autocomplete="current-password"
+                                required
+                            >
+                            <button
+                                type="button"
+                                class="toggle-password"
+                                id="togglePassword"
+                                aria-label="Show password"
+                            >Show</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="login-button">
+                        Sign In <span>→</span>
+                    </button>
+                </form>
+
+                <div class="form-divider">
+                    <span>NEW TO MINDCARE AI?</span>
+                </div>
+
+                <a href="{% url 'register' %}" class="register-button">
+                    Create an account
+                </a>
+
+                <p class="privacy-note">
+                    🌱 Take a moment for yourself. You're worth it.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const toggleButton = document.getElementById("togglePassword");
+        const passwordInput = document.getElementById("password");
+
+        toggleButton.addEventListener("click", function () {
+            const isPassword = passwordInput.type === "password";
+
+            passwordInput.type = isPassword ? "text" : "password";
+            toggleButton.textContent = isPassword ? "Hide" : "Show";
+            toggleButton.setAttribute(
+                "aria-label",
+                isPassword ? "Hide password" : "Show password"
+            );
+        });
+    </script>
 </body>
 </html>
+```

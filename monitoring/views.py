@@ -2,6 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.conf import settings
+import base64
+import numpy as np
+from deepface import DeepFace
+from django.views.decorators.http import require_POST
 
 import json
 import os
@@ -595,14 +599,21 @@ def recommendations(request):
             'sleep_hours': sleep_hours,
             'stress_score': stress_score,
             'journal_sentiment': journal_sentiment,
+<<<<<<< HEAD
             'expression': expression,
             'heart_rate': heart_rate,
             'distress_level': distress_level,
         },
+=======
+            'facial_expression': facial_expression,
+            'heart_rate': heart_rate
+        }
+>>>>>>> 3033378 (11.10.26)
     )
 
 
 @login_required
+<<<<<<< HEAD
 def recommendation_history(request):
     recommendation_history = Recommendation.objects.filter(
         user=request.user
@@ -658,3 +669,68 @@ def facial_expression(request):
         'monitoring/facial_expression.html',
         {'facial_expressions': facial_expressions},
     )
+=======
+def facial_expression(request):
+    return render(
+        request,
+        'monitoring/facial_expression.html'
+    )
+
+@login_required
+@require_POST
+def detect_facial_expression(request):
+    try:
+        image_data = json.loads(request.body).get("image", "")
+
+        if not image_data.startswith("data:image/"):
+            return JsonResponse(
+                {"error": "A valid camera image is required."},
+                status=400
+            )
+
+        header, encoded_image = image_data.split(",", 1)
+        image_bytes = base64.b64decode(encoded_image, validate=True)
+
+        if len(image_bytes) > 5 * 1024 * 1024:
+            return JsonResponse(
+                {"error": "Image is too large."},
+                status=413
+            )
+
+        import cv2
+
+        image_array = np.frombuffer(image_bytes, dtype=np.uint8)
+        frame = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+
+        if frame is None:
+            return JsonResponse(
+                {"error": "Could not read the camera image."},
+                status=400
+            )
+
+        result = DeepFace.analyze(
+            img_path=frame,
+            actions=["emotion"],
+            enforce_detection=True,
+            detector_backend="opencv"
+        )
+
+        expression = result[0]["dominant_emotion"].lower()
+
+        FacialExpression.objects.create(
+            user=request.user,
+            expression=expression
+        )
+
+        return JsonResponse({
+            "expression": expression,
+            "message": "Expression detected and saved."
+        })
+
+    except Exception as error:
+        print("Facial expression detection error:", error)
+        return JsonResponse(
+            {"error": "Detection failed. Ensure your face is visible and try again."},
+            status=400
+        )
+>>>>>>> 3033378 (11.10.26)
